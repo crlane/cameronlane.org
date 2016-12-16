@@ -21,7 +21,7 @@ submodules:
 	@git submodules update --init --recursive
 
 test: 
-	@docker run --rm ${ORG}/${TEST}
+	@docker run --rm -v`pwd`/builder/test:/opt/src/builder/test ${ORG}/${TEST}
 
 serve:
 	@docker run --rm -it -p8000:8000 ${ORG}/${BASE} sitebuilder serve --debug
