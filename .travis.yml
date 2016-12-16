@@ -6,6 +6,7 @@ services:
 before_install:
   - make image
 script:
+  - make test-image
   - make test
 git:
   submodules: false
