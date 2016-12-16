@@ -14,4 +14,4 @@ git:
   submodules: false
 
 after_success:
-  - coveralls --data-file builder/test/coverage.xml
+  - coveralls --data_file builder/test/coverage.xml
