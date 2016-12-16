@@ -2,4 +2,3 @@ pytest
 mock
 pytest-coverage
 coverage
-coveralls
