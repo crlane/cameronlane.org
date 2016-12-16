@@ -1,0 +1,98 @@
+<!doctype html>
+<html class="no-js" lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>
+        blog | Simple Text to Speech in Python
+    </title>
+    <meta name="description" content="Cameron Lane's homepage.">
+    <meta name="viewport" content="width=device-width">
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    
+    
+    <link rel="stylesheet" type="text/css" href="/static/css/style.css?b8109c33">
+    
+    
+</head>
+<body class="blog">
+    <div class="container">
+        <header class="main-title">
+            <h1><a href="/">Cameron <strong>Lane</strong></a></h1>
+            <small>Erstwhile educator. Python programmer.</small>
+        </header>
+        <div class="contents">
+            
+    
+     <h1>Simple Text to Speech in Python</h1>
+<p>I wanted to make a simple counter that would speak the numbers from 1 to 100. I knew that OS X had the capability using the <code>say</code> command, but I wanted to use python. Thus, I came up with this little python script:</p>
+<pre><code class="python">#!/usr/bin/env python
+import os
+
+for i in range(1,100):
+    os.system('say %s' % i)
+</code></pre>
+
+<p>That's fun, but I don't really think it works as a timer or anything.  This got me thinking about other interesting scripts that could make use of the <code>say</code> command.  I can think of few things better than 'Fitter, Happier' from Radiohead's classic album, <em>OK Computer</em>. At any rate, here's how to do it, using a text file on my website and a python script:</p>
+<pre><code class="python">#!/usr/bin/env python
+import os,urllib2
+
+URL = 'http://cameronlane.org/misc/fitter_happier.txt'
+f = urllib2.urlopen(URL)
+os.system('say %s' % f.read())
+</code></pre>
+
+<p>This works okay, but the voice is not quite right. After consulting the man pages for <code>say</code> on OS X, I learned that supplying the <code>-v</code> switch followed by a valid voice name can produce the result we want.  Looking through the list in system preferences, Fred is the closest to the recording.  Making the change to the relevant part of the script results in the following:</p>
+<pre><code class="python">#!/usr/bin/env python
+import os,urllib2
+
+URL = 'http://cameronlane.org/misc/fitter_happier.txt'
+f = urllib2.urlopen(URL)
+os.system('say -v fred %s' % f.read())
+
+foo = bar
+</code></pre>
+
+<p>You can download the entire script from my <a href="https://gist.github.com/4384779">github</a> gists.</p>
+     
+
+    <div id="disqus_thread"></div>
+
+        </div>
+        <nav class="sidebar">
+            <ul>
+                <li class="home"><a href="/">home</a></li>
+                <li class="blog"><a href="/blog/">blog</a></li>
+                <li class="resume"><a href="/resume/">resume</a></li>
+                <li class="contact"><a href="/contact/">contact</a></li>
+            </ul>
+        </nav>
+        <footer class="site-footer">
+            <p>
+                &copy; 2012-2015 Cameron Lane
+                - <a href="http://github.com/crlane">GitHub</a>
+                - <a href="http://twitter.com/crlane">Twitter</a> 
+            </p>
+        </footer>
+    </div>
+    
+        
+    
+    <script type="text/javascript" src="/static/js/app.js?d278a4a6"></script>
+    
+    
+    <script type="text/javascript">
+        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+        var disqus_shortname = 'crlane'; // required: replace example with your forum shortname
+
+        /* * * DON'T EDIT BELOW THIS LINE * * */
+        (function() {
+            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+            dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+    
+</body>
+</html>

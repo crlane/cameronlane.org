@@ -1,0 +1,16 @@
+language: python
+python:
+   - "2.7"
+services:
+  - docker
+before_install:
+  - make image
+install:
+  - make run
+script:
+  - make test
+git:
+  submodules: false
+
+after_success:
+  - coveralls

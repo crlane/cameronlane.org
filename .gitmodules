@@ -1,0 +1,3 @@
+[submodule "builder/pages/posts"]
+	path = builder/pages/posts
+	url = git@github.com:crlane/blogposts.git

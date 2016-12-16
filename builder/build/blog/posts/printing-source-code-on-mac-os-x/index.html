@@ -1,0 +1,97 @@
+<!doctype html>
+<html class="no-js" lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>
+        blog | Printing Source Code on Mac OS X
+    </title>
+    <meta name="description" content="Cameron Lane's homepage.">
+    <meta name="viewport" content="width=device-width">
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    
+    
+    <link rel="stylesheet" type="text/css" href="/static/css/style.css?b8109c33">
+    
+    
+</head>
+<body class="blog">
+    <div class="container">
+        <header class="main-title">
+            <h1><a href="/">Cameron <strong>Lane</strong></a></h1>
+            <small>Erstwhile educator. Python programmer.</small>
+        </header>
+        <div class="contents">
+            
+    
+     <h1>Printing Source Code on Mac OS X</h1>
+<p>We recently encountered a situation where we needed to print (on paper!) the contents of an entire source code repository. I know, it sounds ridiculous, but sometimes compliance with some business or legal requirements forces programmers into doing silly things. Thus I began to look for a way to print source code to pdf. </p>
+<h2>Enscript</h2>
+<p>After some quick web searches, I decided to use <a href="http://www.gnu.org/software/enscript/">enscript</a>. Enscript is a command line tool that prints to PostScript. It also has the advantage of being highly configurable and fast. In addtion, I needed a tool to produce pdf files from the PostScript files. There are lots of good tutorials online for how to do this, and eventually I settled on pstopdf, as illustrated in <a href="http://qosys.info/642/printing-source-code-mac-os">this post</a>. Both of these packages were available from homebrew (pstopdf as part of <a href="http://www.ghostscript.com/Ghostscript.html">GhostScript</a>). So all I needed to get started was this:</p>
+<pre><code>$ brew install enscript ghostscript
+</code></pre>
+<p>As I mentioned, enscript is highly configurable so you'll want to check the documentation to get the command exactly right for your use case. This is the command I decided on:</p>
+<pre><code>$ enscript -1rG --line-numbers --highlight=python -p - --color=0 somefile.py \-
+| pstopdf -i -o somefile.pdf
+</code></pre>
+<p>This will create a pdf called somefile.pdf in the landsscape orientation (-r option)with 1 page of source per output page (-1). In addition, the file will be created with a fancy header (-G option, see manpage for details and configuration options), which includes the filename and a timestamp.</p>
+<p>One potential pitfall here is the <code>-p -</code> option (note the trailing dash). This allows you do create a temporary (in memory, I think) file which can then be piped as input to <code>pstopdf</code>. If you do not include it, you'll get strange errors and no output.</p>
+<p>The rest of the options are pretty straightforward. </p>
+<h2>Selecting Source Files</h2>
+<p>The local directory that houses my source code has a lot of things in it that are not my source. For instance, it has a Git repository, a virtualenv, and a host of .pyc and other things that are not relevant. So we need a way to traverse the directory and prune files/directories that are not relevant. Python's <code>os.walk</code> is a great solution for this.</p>
+<p>One of the strange things to grasp about <code>os.walk</code> is that it returns a 3-tuple for each directory it encounters on its recursive walk down a file path, including the start path.  The members of that tuple are the current directory's path, a list of all of the subdirectories in the current location, and a list of all of the regular files in the current location. What's nice is that you can change the subdirectories list in the context of the iteration, which can help you prune the number of directories you search. Here's a quick example:</p>
+<pre><code>for dirname, subdirs, files in os.walk(START_DIR):
+    if 'env' in subdirs:
+        del subdirs[subdirs.index('env')] # remove virtualenv directory
+    if '.git' in subdirs:
+        del subdirs[subdirs.index('.git')] # remove git repository
+    for f in files:
+        if f.endswith('.py'):
+           print 'I am a python source file!'
+</code></pre>
+<p>This will skip the virtualenv and .git directories on the walk, leaving you with a walk that will only identify the files you want, in this case, .py source files.</p>
+<h2>Putting it all Together</h2>
+<p>In the end, I wrote a quick python script that used the <code>subprocess</code> module to run my <code>enscript</code> command for files that I identified using <code>os.walk</code>. You can see my complete solution <a href="https://gist.github.com/2a1b3a89ada912caa2ca">here</a>.</p>
+<p>I was really pleased with the way that enscript worked. Combined with a little python scripting and the os.walk magic, I was able to create a quick script to print out all the source files to pdf.  </p>
+     
+
+    <div id="disqus_thread"></div>
+
+        </div>
+        <nav class="sidebar">
+            <ul>
+                <li class="home"><a href="/">home</a></li>
+                <li class="blog"><a href="/blog/">blog</a></li>
+                <li class="resume"><a href="/resume/">resume</a></li>
+                <li class="contact"><a href="/contact/">contact</a></li>
+            </ul>
+        </nav>
+        <footer class="site-footer">
+            <p>
+                &copy; 2012-2015 Cameron Lane
+                - <a href="http://github.com/crlane">GitHub</a>
+                - <a href="http://twitter.com/crlane">Twitter</a> 
+            </p>
+        </footer>
+    </div>
+    
+        
+    
+    <script type="text/javascript" src="/static/js/app.js?d278a4a6"></script>
+    
+    
+    <script type="text/javascript">
+        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+        var disqus_shortname = 'crlane'; // required: replace example with your forum shortname
+
+        /* * * DON'T EDIT BELOW THIS LINE * * */
+        (function() {
+            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+            dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+    
+</body>
+</html>

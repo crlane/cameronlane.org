@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block contents %}
+    <h1>Tag Cloud</h1>
+    <div id="wordcloud" style="width: 550px; height: 350px; border: 1px solid #ccc;"></div>
+{% endblock contents %}
+{% block scripts %}
+    {{ super() }}
+    <script>
+        var word_list = {{ tags | safe }};
+        $(function() {
+            $('#wordcloud').jQCloud(word_list);
+        });
+    </script>
+{% endblock scripts %}

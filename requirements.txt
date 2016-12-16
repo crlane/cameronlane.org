@@ -1,0 +1,10 @@
+bitly-api
+python-twitter
+boto
+docopt
+flask
+flask-flatpages
+frozen-flask
+flask-assets
+cssmin
+stylus

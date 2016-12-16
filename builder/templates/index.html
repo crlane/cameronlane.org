@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+<article>
+{% if page %}
+    {% block contents %}
+     {{ page.html | safe }}
+    {% endblock contents %}
+{% else %}
+    <p>Unable to locate file</p>
+{% endif %}
+</article>

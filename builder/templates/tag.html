@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block section %}blog{% endblock %}
+{% block contents %}
+    {% if tags %}
+       <h2>Here are all the tags</h2>
+       <ul>
+      {% for t in tags %}
+          <li><a href="{{ url_for(".tag", tag=t) }}">{{ t }}</a></li>
+      {% endfor %}
+      </ul>
+    {% else %}
+        <h2>List of stuff tagged <em>{{ tag }}</em></h2>
+        {% with pages=pages  %}
+            {% include "_list.html" %}
+        {% endwith %}
+    {% endif %}
+{% endblock contents %}

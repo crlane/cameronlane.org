@@ -1,0 +1,4 @@
+FROM crlane/blog-builder
+
+RUN pip install -r test_requirements.txt
+ENTRYPOINT py.test .

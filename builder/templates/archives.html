@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block page_title %}blog archives{% endblock %}
+{% block section %}blog{% endblock %}
+{% block contents %}
+    <h1>Blog Archive</h1>
+    {% if years %}
+    <ul>
+    {% for y in years %}
+        <li>
+            <a href="{{ url_for(".archive", year=y) }}">{{ y }}</a>
+        </li>
+    {% else %}
+    <li>No years to show you!</li>
+    {% endfor %}
+    </ul>
+    {% endif %}
+
+    {% if year %}
+    <h2>{{ year }}</h2>
+        {% if posts %}
+            <ul>
+                {% for post in posts %}
+                <li>
+                    <a href="{{ url_for(".page", path=post.path) }}">{{ post.title }}</a>
+                </li>
+        {% else %}
+            <li>No stuff.</li>
+            {% endfor %}
+            </ul>
+            {% endif %}
+    {% endif %}
+
+{% endblock contents %}

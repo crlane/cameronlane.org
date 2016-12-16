@@ -1,0 +1,50 @@
+<!doctype html>
+<html class="no-js" lang="{% block lang %}en{% endblock lang %}">
+<head>
+    <meta charset="utf-8">
+    <title>
+        {% block page_title %}{{ ' | '.join([section, title ]) }}{% endblock page_title %}
+    </title>
+    <meta name="description" content="Cameron Lane's homepage.">
+    <meta name="viewport" content="width=device-width">
+    <link rel="shortcut icon" href="{{ url_for('.static', filename='favicon.ico') }}">
+    {% block styles %}
+    {% assets "css_all" %}
+    <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}">
+    {% endassets %}
+    {% endblock styles %}
+</head>
+<body class="{% block section %}{{ section }}{% endblock %}{% block body_class %}{% endblock body_class %}">
+    <div class="container">
+        <header class="main-title">
+            <h1><a href="{{ url_for(".index") }}">Cameron <strong>Lane</strong></a></h1>
+            <small>Erstwhile educator. Python programmer.</small>
+        </header>
+        <div class="contents">
+            {% block contents %}
+                <p>These are the default contents.</p>
+            {% endblock contents %}
+        </div>
+        <nav class="sidebar">
+            <ul>
+                <li class="home"><a href="{{ url_for(".index") }}">home</a></li>
+                <li class="blog"><a href="{{ url_for(".blog_posts") }}">blog</a></li>
+                <li class="resume"><a href="{{ url_for(".resume") }}">resume</a></li>
+                <li class="contact"><a href="{{ url_for(".contact") }}">contact</a></li>
+            </ul>
+        </nav>
+        <footer class="site-footer">
+            <p>
+                &copy; 2012-{{ current_year }} Cameron Lane
+                - <a href="http://github.com/crlane">GitHub</a>
+                - <a href="http://twitter.com/crlane">Twitter</a> 
+            </p>
+        </footer>
+    </div>
+    {% block scripts %}
+    {% assets "js_all" %}
+    <script type="text/javascript" src="{{ ASSET_URL }}"></script>
+    {% endassets %}
+    {% endblock scripts %}
+</body>
+</html>

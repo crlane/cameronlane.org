@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block contents %}
+    <h2>Things I've Written</h2>
+    {% if posts %}
+    <ul>
+    {% for post in posts %}
+        <li>
+            <a href="{{ url_for(".page", path=post.path) }}">{{ post.title }}</a>
+        </li>
+    {% else %}
+        <li>No stuff.</li>
+    {% endfor %}
+    </ul>
+    <p> You can also view my posts by topical <a href="{{ url_for(".tags",) }}">tags</a> or browse the
+            <a href="{{ url_for(".archives",) }}">archives.</a></p>
+    {% endif %}
+{% endblock contents %}
