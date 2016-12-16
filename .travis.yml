@@ -6,7 +6,7 @@ services:
 before_install:
   - make image
 install:
-  - pip install coveralls
+  - pip install python-coveralls
 script:
   - make test-image
   - make test
