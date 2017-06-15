@@ -1,5 +1,5 @@
 import os
-from urlparse import urljoin
+from urllib.parse import urljoin
 
 # Flask Configuration
 BASE_URL = 'https://cameronlane.org'

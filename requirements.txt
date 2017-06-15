@@ -1,10 +1,6 @@
-bitly-api
-python-twitter
-boto
-docopt
-flask
-flask-flatpages
-frozen-flask
-flask-assets
-cssmin
-stylus
+boto==2.47.0
+docopt==0.6.2
+Flask==0.12.2
+Flask-Assets==0.12
+Flask-FlatPages==0.6
+Frozen-Flask==0.14

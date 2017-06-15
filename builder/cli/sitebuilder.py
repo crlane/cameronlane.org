@@ -1,36 +1,35 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+
 '''Sitebuilder
 
 Usage:
-    sitebuilder build
-    sitebuilder deploy [--delete]
-    sitebuilder new [--title=<TITLE> --draft]
-    sitebuilder serve [--debug --host=<HOST> --port=<PORT>]
-    sitebuilder test
+    sitebuilder.py build
+    sitebuilder.py deploy [--delete]
+    sitebuilder.py new TITLE [--draft]
+    sitebuilder.py serve [--debug --host=HOST --port=PORT]
+    sitebuilder.py test
 
 Options:
-    --title=<TITLE>
-    --draft
     -D --debug        start the server in debug mode
-    -H --host=<HOST>  start the webserver on the given host [default: 0.0.0.0]
-    -p --port=<PORT>  start the webserver on port NUM [default: 8000]
+    -H --host=HOST  start the webserver on the given host [default: 0.0.0.0]
+    -p --port=PORT  start the webserver on port NUM [default: 8000]
+    --draft
 '''
 
 import os
 import codecs
-import re
 import sys
-import twitter
-import bitly_api
-import logging
+
+from configparser import SafeConfigParser, NoSectionError
+from datetime import datetime
+from urllib.parse import quote
+
 
 from boto.s3.connection import S3Connection
 from boto.s3.key import Key
-from ConfigParser import SafeConfigParser, NoSectionError
 from docopt import docopt
-from datetime import datetime
-
-from urlparse import urljoin
-from urllib import quote
 
 
 from builder.app import (
@@ -43,8 +42,6 @@ from builder.util import (
     get_file_path
 )
 
-logger = logging.getLogger(__name__)
-
 cfg = None
 
 
@@ -56,48 +53,49 @@ def _get_cfg(app):
     return cfg
 
 
-def new_blog_post_tweet(app, new_post):
-    '''Hook into twitter api to publish a tweet with link to new blog post'''
-    cfg = _get_cfg(app)
-    bitly_cred = dict(cfg.items('bitly'))
-    tw_cred = dict(cfg.items('twitter'))
-
-    file_path = new_post.name.split('/')[-1].split('.')[0]
-    title = None
-    new_post.seek(0)
-    match = re.search(r'^[Tt]itle:\s*(.*)$', new_post.read(), re.MULTILINE)
-    if match:
-        try:
-            title = unicode(match.group(1), 'ascii')
-        except IndexError:
-            print 'regex did not work properly...exiting'
-    else:
-        print 'blank post: {}'.format(title)
-        return
-
-    if title:
-        intro = 'New blog post:'
-        long_url = urljoin(app.PUBLISH_URL, file_path)
-        bitly_app = bitly_api.Connection(**bitly_cred)
-        tw_app = twitter.Api(**tw_cred)
-        shurl = bitly_app.shorten(long_url)
-        tweet = ' '.join([intro, title, shurl['url']])
-
-        logger.debug('About to tweet this: %s', tweet)
-        if not app.debug:
-            tw_app.PostUpdate(tweet)
+# def new_blog_post_tweet(app, new_post):
+#     '''Hook into twitter api to publish a tweet with link to new blog post'''
+#     cfg = _get_cfg(app)
+#     bitly_cred = dict(cfg.items('bitly'))
+#     tw_cred = dict(cfg.items('twitter'))
+#
+#     file_path = new_post.name.split('/')[-1].split('.')[0]
+#     title = None
+#     new_post.seek(0)
+#     match = re.search(r'^[Tt]itle:\s*(.*)$', new_post.read(), re.MULTILINE)
+#     if match:
+#         try:
+#             title = unicode(match.group(1), 'ascii')
+#         except IndexError:
+#             print('regex did not work properly...exiting')
+#
+#     else:
+#         print('blank post: {}'.format(title))
+#         return
+#
+#     if title:
+#         intro = 'New blog post:'
+#         long_url = urljoin(PUBLISH_URL, file_path)
+#         bitly_app = bitly_api.Connection(**bitly_cred)
+#         tw_app = twitter.Api(**tw_cred)
+#         shurl = bitly_app.shorten(long_url)
+#         tweet = ' '.join([intro, title, shurl['url']])
+#
+#         print('About to tweet this: {}'.format(tweet))
+#         if not app.debug:
+#             tw_app.PostUpdate(tweet)
 
 
 # CLI API
 def build(app):
     ''' Builds this site.
     '''
-    print 'Starting website build'
+    print('Starting website build')
     app.debug = False
     app.config['ASSETS_DEBUG'] = False
     freezer = create_freezer(app)
     freezer.freeze()
-    print 'Build is complete.'
+    print('Build is complete.')
 
 
 def _get_files_for_deploy(build_dir):
@@ -105,14 +103,14 @@ def _get_files_for_deploy(build_dir):
         current = os.path.basename(dirpath)
         # ignore hidden directories
         if current.startswith('.'):
-            _, filenames = [], []
+            dirnames, filenames = [], []
             continue
         # ignore un min/uglifed js and javascripts
         elif 'javascripts' in dirpath:
-            _, filenames = [], []
+            dirnames, filenames = [], []
             continue
         elif 'stylesheets' in dirpath:
-            _, filenames = [], []
+            dirnames, filenames = [], []
             continue
         for f in filenames:
             # ignore hidden filenames
@@ -130,32 +128,31 @@ def _get_files_for_deploy(build_dir):
 def deploy(app, delete=False, dry_run=True):
     build(app)
     files = _get_files_for_deploy(app.config['FREEZER_DESTINATION'])
-    # TODO: this should be factored out into
+    # TODO: this should be factored out into 
     # a class for managing 3rd party plugins
     cfg = _get_cfg(app)
     try:
         s3 = dict(cfg.items('s3'))
-    except NoSectionError:
-        logger.exception('No api credentials configured for %s', 's3')
+    except NoSectionError as e:
+        print('No api credentials configured for s3')
         sys.exit(1)
 
     conn = S3Connection(s3['aws_access_key_id'], s3['aws_secret_access_key'])
     bucket = conn.get_bucket(s3['bucket_name'])
     if delete:
         for key in bucket.list():
-            if not key.name.startswith('logs/'):
-                print 'Deleting {}'.format(key.name)
-                if not dry_run:
-                    key.delete()
+            print('Deleting {}'.format(key.name))
+            if not dry_run:
+                key.delete()
 
     for keyname, localpath in files:
         if not dry_run:
             k = Key(bucket)
             k.key = quote(keyname)
             k.set_contents_from_filename(localpath)
-        print 'Set key contents for {}'.format(keyname)
+        print('Set key contents for {}'.format(keyname))
 
-    print 'Succesful deployment, done!'
+    print('Succesful deployment, done!')
 
 
 def new(app, draft=True, title=None, section='posts', filename=None):
@@ -167,7 +164,7 @@ def new(app, draft=True, title=None, section='posts', filename=None):
     :kwarg: filename (str) - file name to be used. If not supplied, one will be determined based on title
     '''
     post_date = datetime.today()
-    title = unicode(title) if title else u'Untitled Post'
+    title = str(title) if title else u'Untitled Post'
     if not filename:
         filename = u'%s.md' % slugify(title)
     pathargs = [section, filename, ]
@@ -184,9 +181,9 @@ def new(app, draft=True, title=None, section='posts', filename=None):
     ])
     try:
         codecs.open(filepath, 'w', encoding='utf8').write(content)
-        logger.info(u'Created %s' % filepath)
+        print(u'Created {}'.format(filepath))
     except Exception:
-        print 'Problem writing to {}'.format(filepath)
+        print('Problem writing to {}'.format(filepath))
         raise
 
 
@@ -195,12 +192,6 @@ def serve(app, host='0.0.0.0', port=8000, debug=False):
     '''
     app.config['ASSETS_DEBUG'] = debug
     app.debug = debug
-    if not app.debug:
-        import logging
-        from logging import FileHandler
-        file_handler = FileHandler('error.log')
-        file_handler.setLevel(logging.WARNING)
-        app.logger.addHandler(file_handler)
     app.run(host=host, port=port, debug=debug)
 
 
@@ -213,11 +204,10 @@ def main():
         deploy(app, delete=arguments.get('--delete', True))
     elif arguments['serve']:
         serve(app, host=arguments.get('--host', '0.0.0.0'),
-              port=int(arguments.get('--port', 8000)), debug=arguments.get('--debug', False))
+            port=int(arguments.get('--port',  8000)), debug=arguments.get('--debug', False))
     elif arguments['new']:
-        new(app, title=arguments.get('--title'), draft=arguments.get('--draft', True))
+        new(app, title=arguments.pop('TITLE'), draft=arguments.get('--draft', True))
     else:
         raise Exception('Something went wrong with your docopt')
-
 if __name__ == '__main__':
     main()

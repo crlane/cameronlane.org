@@ -15,7 +15,7 @@ def test_get_home_page(test_client):
 @pytest.mark.parametrize('page_name', ['blog', 'resume', 'contact'])
 def test_get_index_page(test_client, page_name):
     response = test_client.get('/{}/'.format(page_name))
-    assert page_name in response.get_data()
+    assert page_name in str(response.get_data())
     assert response.status_code == 200, 'Bad response for {} page'.format(page_name)
 
 
@@ -70,12 +70,11 @@ def test_pages_filter_by_missing_year(test_app):
         assert len(pages_filter(year=year)) == 0, 'Incorrect number of posts for missing year: {}'.format(year)
 
 
-@pytest.mark.parametrize('debug,tag,pages_count', [
-    (True, 'foo', 2), (True, 'bar', 1), (True, 'baz', 1),
-    (True, 'fizz', 1), (True, 'buzz', 1), (True, 'notatag', 0),
-    (False, 'foo', 1), (False, 'bar', 1), (False, 'baz', 1),
-    (False, 'fizz', 0), (False, 'buzz', 0), (False, 'notatag', 0)]
-)
+@pytest.mark.parametrize('debug,tag,pages_count', 
+    [(True, 'foo', 2), (True,'bar', 1), (True,'baz', 1),
+     (True, 'fizz', 1), (True, 'buzz', 1), (True, 'notatag', 0),
+     (False, 'foo', 1), (False, 'bar', 1), (False, 'baz', 1),
+     (False, 'fizz', 0), (False, 'buzz', 0), (False, 'notatag', 0)])
 def test_pages_filter_by_tag_based_on_debug(test_app, debug, tag, pages_count):
     test_app.debug = debug
     with test_app.test_request_context():
@@ -97,10 +96,9 @@ def test_pages_filter_selects_posts_based_on_debug(test_app, debug, pages_count)
         assert len(pages) == pages_count, 'Pages count incorrect when debug={}'.format(debug)
 
 
-@pytest.mark.parametrize('debug,expected_tags', [
-    (True, {'foo': 2, 'bar': 1, 'baz': 1, 'fizz': 1, 'buzz': 1}),
-    (False, {'foo': 1, 'bar': 1, 'baz': 1})]
-)
+@pytest.mark.parametrize('debug,expected_tags', 
+        [(True, {'foo': 2, 'bar': 1, 'baz': 1, 'fizz': 1, 'buzz':1}), 
+            (False, {'foo': 1, 'bar': 1, 'baz': 1})])
 def test_get_tag_counts_based_on_debug(test_app, debug, expected_tags):
     test_app.debug = debug
     with test_app.test_request_context():
