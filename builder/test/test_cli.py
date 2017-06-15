@@ -1,6 +1,8 @@
+import os
 import pytest
+import subprocess
 
-from mock import patch, Mock
+from unittest.mock import patch, Mock
 
 from builder.cli import sitebuilder
 from builder.app import get_pages
@@ -10,7 +12,10 @@ COMMANDS = ['build', 'serve', 'deploy', 'new']
 
 @pytest.fixture(scope='function', params=COMMANDS)
 def mock_args(request):
-    return request.param, {cmd: True if request.param == cmd else False for cmd in COMMANDS}
+    command_args = {cmd: True if request.param == cmd else False for cmd in COMMANDS}
+    if request.param == 'new':
+        command_args['TITLE'] = 'this-is-a-new-post'
+    return request.param, command_args
 
 
 @pytest.mark.usefixtures('creates_posts')

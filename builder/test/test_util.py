@@ -9,8 +9,8 @@ from builder.util import (
 
 @pytest.mark.parametrize('title,expected', [
     (u'Hello, World!', 'hello-world'),
-    (u'Who\'s #1?', 'who-s-1')]
-)
+    (u'Who\'s #1?', 'who-s-1'),
+])
 def test_slugify(title, expected):
     assert slugify(title) == expected
 

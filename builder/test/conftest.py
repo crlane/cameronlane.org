@@ -15,9 +15,13 @@ def tmp_api_cfg(tmpdir_factory):
 
 @pytest.fixture(scope='function')
 def s3_config(tmp_api_cfg):
-    creds = dict(section='s3', values=dict(aws_access_key_id='foo', aws_secret_access_key='bar', bucket_name='example.com'))
+    creds = dict(section='s3', values=dict(
+        aws_access_key_id='foo',
+        aws_secret_access_key='bar',
+        bucket_name='example.com')
+    )
     section = '[{}]'.format(creds['section'])
-    keys = ['{}={}'.format(k, v) for k, v in creds['values'].iteritems()]
+    keys = ['{}={}'.format(k, v) for k, v in creds['values'].items()]
     tmp_api_cfg.write('\n'.join([section] + keys))
     return tmp_api_cfg
 
@@ -46,9 +50,9 @@ def tmp_pages(tmpdir_factory, page_template, draft_post, published_post):
     wd = tmpdir_factory.mktemp('pages')
     for page in ['home', 'resume', 'contact']:
         p = wd.ensure('{}.md'.format(page))
-        page_data = page_template.format(
-                **{'title': page, 'date_': now.strftime('%Y-%m-%d'),
-                   'published': True, 'type_': 'page', 'tags': '', 'content': '# {}'.format(page)})
+        page_data= page_template.format(
+            **{'title':page, 'date_': now.strftime('%Y-%m-%d'),
+                'published': True, 'type_': 'page', 'tags': '', 'content': '# {}'.format(page)})
         p.write(page_data)
 
     published = wd.ensure('posts', 'this-post-is-published.md')
@@ -83,7 +87,7 @@ def test_conf(request, tmp_pages_path, tmp_api_cfg_path, tmp_build):
 
 
 @pytest.fixture(scope='session')
-def test_app(request, test_conf):
+def test_app(test_conf):
     app = create_app(test_conf)
     return app
 
@@ -112,13 +116,13 @@ tags: {tags}
 @pytest.fixture(scope='session')
 def published_post(request, page_template):
     template = dict(
-        title='This Post Exists',
-        date_=datetime.today().strftime('%Y-%m-%d'),
-        published=True,
-        type_='post',
-        tags=','.join(['foo', 'bar', 'baz']),
-        content='# Hello! This is a published post'
-    )
+            title='This Post Exists',
+            date_=datetime.today().strftime('%Y-%m-%d'),
+            published=True,
+            type_='post',
+            tags=','.join(['foo', 'bar', 'baz']),
+            content='# Hello! This is a published post'
+            )
 
     return page_template.format(**template)
 
@@ -126,12 +130,12 @@ def published_post(request, page_template):
 @pytest.fixture(scope='session')
 def draft_post(request, page_template):
     template = dict(
-        title='This Post Exists',
-        date_=datetime.now().strftime('%Y-%m-%d'),
-        published=False,
-        type_='post',
-        tags=','.join(['fizz', 'buzz', 'foo']),
-        content='# Hello! This is a draft post'
-    )
+            title='This Post Exists',
+            date_=datetime.now().strftime('%Y-%m-%d'),
+            published=False,
+            type_='post',
+            tags=','.join(['fizz', 'buzz', 'foo']),
+            content='# Hello! This is a draft post'
+            )
 
     return page_template.format(**template)

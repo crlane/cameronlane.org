@@ -2,6 +2,9 @@ import json
 import logging
 
 from collections import Counter
+from datetime import date, datetime
+from urllib.parse import unquote
+
 from flask import (
     Flask,
     Blueprint,
@@ -12,13 +15,11 @@ from flask import (
 
 from flask_flatpages import FlatPages
 from flask_frozen import Freezer
-from flask_assets import (
+from flask.ext.assets import (
     Environment,
     Bundle
 )
 
-from urllib import unquote
-from datetime import date, datetime
 
 log = logging.getLogger(__name__)
 
@@ -40,15 +41,17 @@ def create_app(settings=None):
     app.config.from_pyfile('config.py')
     if settings is not None:
         app.config.update(settings)
-
     app.register_blueprint(blog)
-    register_errorhandlers(app)
 
     # create the static assets
     create_assets(app)
 
     # get the flat pages
     get_pages().init_app(app)
+
+    # has to happen after static assets are registered
+    register_errorhandlers(app)
+
     return app
 
 
@@ -62,7 +65,7 @@ def create_freezer(app):
 def register_errorhandlers(app):
     def render_error(error):
         error_code = getattr(error, 'code', 500)
-        return render_template("{0}.html".format(error_code)), error_code
+        return render_template("{0}.html".format(error_code), section='error'), error_code
 
     for errcode in [403, 404, 500]:
         app.errorhandler(errcode)(render_error)
@@ -78,7 +81,8 @@ def create_assets(app):
         filters=js_filters,
         output='js/app.js')
 
-    css_filters = ['cssmin', 'stylus'] if not app.debug else []
+    # TODO:, include stylus
+    css_filters = ['cssmin'] if not app.debug else []
     css = Bundle(
         'stylesheets/style.css',
         'stylesheets/jqcloud.css',
@@ -222,10 +226,11 @@ def get_tag_counts(pages):
     for p in pages:
         tags = p.meta.get('tags')
         if tags:
-            tag_dict.update([t.strip().lower() for t in tags.split(',') if t])
+            tag_dict.update([t.strip().lower()
+                             for t in tags.split(',') if t])
     return dict(tag_dict)
 
 
 def generate_tag_wordcloud_data(tags):
-    for tag, weight in tags.iteritems():
+    for tag, weight in tags.items():
         yield dict(text=tag, weight=weight, link=url_for('.tag', tag=tag))
