@@ -24,7 +24,7 @@ test:
 	@docker run --rm -v`pwd`:/opt/src ${ORG}/${TEST}
 
 serve:
-	@docker run --rm -it -p8000:8000 ${ORG}/${BASE} sitebuilder serve --debug
+	@docker run --rm -it -v`pwd`/builder/pages:/opt/src/builder/pages -p8000:8000 ${ORG}/${BASE} sitebuilder serve --debug
 
 clean:
 	@docker stop ${TEST}
