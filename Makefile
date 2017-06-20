@@ -6,7 +6,7 @@ DEPLOY ?= ${BASE}-deploy
 .PHONY: image deploy submodules test serve
 .IGNORE: clean
 
-all: image test-image
+all: image
 
 image:
 	@docker build -t ${ORG}/${BASE} .
@@ -18,7 +18,7 @@ _install:
 	@pip install .
 
 deploy: _install
-	@sitebuilder deploy
+	@sitebuilder deploy --delete
 
 submodules:
 	@git submodules update --init --recursive

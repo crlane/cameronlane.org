@@ -17,6 +17,7 @@ FLATPAGES_MARKDOWN_EXTENSIONS = ['fenced_code', 'footnotes', 'codehilite']
 FREEZER_BASE_URL = BASE_URL
 FREEZER_REMOVE_EXTRA_FILES = True
 FREEZER_DESTINATION = os.getenv('BLOG_BUILD_DIR', os.path.join(gettempdir(), 'blog_build'))
+FREEZER_STATIC_IGNORE = ['javascripts/*', '*.styl', '*.scss', 'stylesheets/*']
 
 # assets pipeline
 ASSETS_DEBUG = True

@@ -1,6 +1,8 @@
 boto==2.47.0
+cssmin==0.2.0
 docopt==0.6.2
 Flask==0.12.2
 Flask-Assets==0.12
 Flask-FlatPages==0.6
 Frozen-Flask==0.14
+jsmin==2.2.2

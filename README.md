@@ -17,33 +17,52 @@ This repo is a static website builder/generator implemented in [Python](http://p
 
 ## Installation
 
-Note: you need a working installation of Python and [pip](http://pypi.python.org/pypi/pip). I've recreated the sitebuilder script as a python package, so you can install it in your virtualenv. 
+Note: you need a working installation of Python and [pip](http://pypi.python.org/pypi/pip). I've recreated the sitebuilder script as a python package, so you can install it in your virtualenv.
 
 ```bash
     $ git clone git@github.com/crlane/cameronlane.org.git blog
     $ cd blog
-    $ git submodule update --init --recursive 
+    $ git submodule update --init --recursive
     $ virtualenv --no-site-packages `pwd`/env
     $ source env/bin/activate
-    (env)$ pip install -r requirements.txt
-    $ pip install -e .
+    (env)$ pip install -e .
 ```
 That'll get you up and running. Use `sitebuilder -h` from the command line for options.
 
 ## Deploying
 
-I've customized deployment steps to push directly to an s3 bucket configured to serve my site. It works for me, but YMMV. This area of the code is probably the least generalizable section, so caveat emptor. 
+I've customized deployment steps to push directly to an s3 bucket configured to serve my site. It works for me, but YMMV. This area of the code is probably the least generalizable section, so caveat emptor.
 
 Also, see the [License section](#license) of this document for more information about contents copyright.
 
 ## Usage
+
+```
+sitebuilder
+
+Usage:
+    sitebuilder build
+    sitebuilder deploy [--delete --dry-run]
+    sitebuilder new TITLE [--draft]
+    sitebuilder serve [--debug --host=HOST --port=PORT]
+    sitebuilder test
+
+Options:
+    -D --debug        start the server in debug mode
+    -H --host=HOST  start the webserver on the given host [default: 0.0.0.0]
+    -p --port=PORT  start the webserver on port NUM [default: 8000]
+    --draft
+    --delete
+    --dry-run
+
+```
 
 The `sitebuilder` command is installed in the package and is the entry point into the entire system
 
 To serve the website locally (optionally in `DEBUG=True` mode):
 
     $ sitebuilder serve --debug
-    * Running on http://127.0.0.1:8000/
+    * Running on http://0.0.0.0:8000/
     * Restarting with reloader
 
 This is useful when you want to see changes without having to rebuild the whole site.
@@ -54,20 +73,11 @@ To build the static website:
 
 Generated HTML files and assets will go to the `./build/` directory.
 
-To deploy the website 
+To deploy the website
 
     $ sitebuilder deploy
 
-There's also a command for creating a post:
 
-    $ sitebuilder new --title="My title"
-    $ Created pages/drafts/my-title.md
-    $ cat pages/drafts/my-title.md
-    title: My title
-    date: 2013-04-22
-    published: False
-    type: post
-    tags:
 
 ## License
 
@@ -76,16 +86,3 @@ Contents in `./pages` (blog posts) are licensed under the terms of the [Creative
 All the rest including Python code, templates, CSS & JavaScript is released under the terms of the [WTFPL](http://sam.zoy.org/wtfpl/).
 
 - This code won't be maintained for any purpose other than my own needs.
-
-## TODO:
-
-* [ ] Dockerize
-* [ ] Post travis CI deployment
-* [ ] Custom exception types
-* [ ] Remove bare print statements
-* [ ] Increase coverage
-* [ ] Double included static directory included in `freezer.all_urls()`
-* [ ] Get build to skip things that aren't needed (unminifed css/js)
-* [ ] Clean up assets, get .styl build working.
-* [ ] Change layout so article pane is more of the screen (move sidebar left)
-* [ ] Coffeescript?

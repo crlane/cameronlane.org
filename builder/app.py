@@ -81,13 +81,11 @@ def register_errorhandlers(app):
 def create_assets(app):
     js_filters = ['jsmin'] if not app.debug else []
     js = Bundle(
-        'javascripts/app.js',
         'javascripts/libs/jquery/jquery-1.11.2.js',
         'javascripts/libs/jqcloud/jqcloud-1.0.4.js',
         filters=js_filters,
         output='js/app.js')
 
-    # TODO:, include stylus
     css_filters = ['cssmin'] if not app.debug else []
     css = Bundle(
         'stylesheets/style.css',
