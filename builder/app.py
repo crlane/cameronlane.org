@@ -15,7 +15,7 @@ from flask import (
 
 from flask_flatpages import FlatPages
 from flask_frozen import Freezer
-from flask.ext.assets import (
+from flask_assets import (
     Environment,
     Bundle
 )
@@ -24,7 +24,12 @@ from flask.ext.assets import (
 log = logging.getLogger(__name__)
 
 
-blog = Blueprint('blog', __name__, static_folder='static', template_folder='templates')
+blog = Blueprint(
+    'blog', __name__,
+    static_folder='static',
+    template_folder='templates'
+)
+
 pages = None
 
 
@@ -63,6 +68,7 @@ def create_freezer(app):
 # Blueprints cannot register 500 error handler see
 # http://stackoverflow.com/questions/30108000/flask-register-blueprint-error-python
 def register_errorhandlers(app):
+
     def render_error(error):
         error_code = getattr(error, 'code', 500)
         return render_template("{0}.html".format(error_code), section='error'), error_code
@@ -122,7 +128,7 @@ def archives():
 
 @blog.route('/blog/archives/<int:year>/')
 def archive(year):
-    posts = pages_filter(year=year)
+    posts = pages_filter(year=year )
     return render_template('archives.html',
                            posts=posts, year=year, section='blog',
                            title='archives {}'.format(year))

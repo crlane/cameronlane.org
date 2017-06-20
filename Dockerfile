@@ -1,4 +1,5 @@
 FROM python:3.6.1
+ENV PYTHONUNBUFFERED=1
 
 RUN apt-get update && apt-get install -y \
     software-properties-common\
@@ -13,5 +14,4 @@ RUN mkdir /opt/src
 ADD . /opt/src
 WORKDIR /opt/src
 
-RUN pip install -r requirements.txt
 RUN pip install -e .

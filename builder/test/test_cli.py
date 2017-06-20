@@ -1,6 +1,4 @@
-import os
 import pytest
-import subprocess
 
 from unittest.mock import patch, Mock
 
@@ -15,6 +13,13 @@ def mock_args(request):
     command_args = {cmd: True if request.param == cmd else False for cmd in COMMANDS}
     if request.param == 'new':
         command_args['TITLE'] = 'this-is-a-new-post'
+    elif request.param == 'deploy':
+        command_args['--dry-run'] = False
+        command_args['--delete'] = False
+    elif request.param == 'serve':
+        command_args['--port'] = '3333'
+        command_args['--host'] = '192.168.1.1'
+
     return request.param, command_args
 
 
@@ -51,28 +56,8 @@ def test_cli_calls_correct_function(test_app, mock_args):
                 assert getattr(sitebuilder, command).call_count == 1
 
 
-def test_cli_deploy_calls_build(test_app, s3_config):
+def test_cli_deploy_calls_build(test_app):
     with patch.object(sitebuilder, 'build'):
-        with patch.object(sitebuilder, 'S3Connection'):
-            sitebuilder.deploy(test_app)
+        with patch.object(sitebuilder, 'Deployment'):
+            sitebuilder.deploy(test_app, False, True)
         assert sitebuilder.build.call_count == 1
-
-
-def test_get_files_ignores_hidden_things(tmp_build, test_build):
-    files = sitebuilder._get_files_for_deploy(tmp_build.strpath)
-    assert files
-    assert not any(keyname.startswith('.') for keyname, localpath in files)
-
-
-def test_get_files_ignores_javascripts(tmp_build, test_build):
-    # if debug is not on
-    files = sitebuilder._get_files_for_deploy(tmp_build.strpath)
-    assert files
-    assert not any('javascripts' in keyname for keyname, localpath in files)
-
-
-def test_get_files_ignores_stylesheets(tmp_build, test_build):
-    # if debug is not on
-    files = sitebuilder._get_files_for_deploy(tmp_build.strpath)
-    assert files
-    assert not any('stylesheets' in keyname for keyname, localpath in files)

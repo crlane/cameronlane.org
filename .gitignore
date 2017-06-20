@@ -10,3 +10,6 @@ builder/static/css/*
 **/*/.cache/*
 *.egg-info
 .cache/*
+crypto/*
+.coverage
+**/*/.coverage

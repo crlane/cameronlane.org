@@ -1,3 +1,16 @@
-*.pyc
-*/*.pyc
-builder/test/__pycache__/*.pyc
+.git
+.dockerignore
+
+### Python ###
+# Byte-compiled / optimized / DLL files
+**/*.py[cod]
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.coverage
+**/*.cache
+**/*coverage.xml
+
+# Sphinx documentation
+docs/_build/

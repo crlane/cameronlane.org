@@ -7,26 +7,28 @@ from builder.app import create_app
 from builder.cli import sitebuilder
 
 
-@pytest.fixture(scope='session')
-def tmp_api_cfg(tmpdir_factory):
-    wd = tmpdir_factory.mktemp('config').join('apis.cfg')
-    return wd
+@pytest.fixture(scope='function')
+def s3_config(request):
+
+    def _remove_env():
+        for k, v in settings.items():
+            del os.environ[k]
+
+    request.addfinalizer(_remove_env)
+
+    settings = dict(
+        AWS_ACCESS_KEY_ID='foo',
+        AWS_SECRET_ACCESS_KEY='bar',
+        S3_BUCKET='example.com'
+    )
+
+    for k, v in settings.items():
+        os.environ[k] = v
+
+    return settings
 
 
 @pytest.fixture(scope='function')
-def s3_config(tmp_api_cfg):
-    creds = dict(section='s3', values=dict(
-        aws_access_key_id='foo',
-        aws_secret_access_key='bar',
-        bucket_name='example.com')
-    )
-    section = '[{}]'.format(creds['section'])
-    keys = ['{}={}'.format(k, v) for k, v in creds['values'].items()]
-    tmp_api_cfg.write('\n'.join([section] + keys))
-    return tmp_api_cfg
-
-
-@pytest.fixture(scope='session')
 def tmp_build(tmpdir_factory):
     wd = tmpdir_factory.mktemp('build')
     return wd
@@ -44,7 +46,7 @@ def creates_posts(request, tmp_pages):
     request.addfinalizer(_reset_posts)
 
 
-@pytest.fixture(scope='session', autouse=True)
+@pytest.fixture(scope='function')
 def tmp_pages(tmpdir_factory, page_template, draft_post, published_post):
     now = datetime.now()
     wd = tmpdir_factory.mktemp('pages')
@@ -62,42 +64,40 @@ def tmp_pages(tmpdir_factory, page_template, draft_post, published_post):
     return wd
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope='function')
 def tmp_pages_path(tmp_pages):
     return os.path.join(tmp_pages.dirname, tmp_pages.basename)
 
 
-@pytest.fixture(scope='session')
-def tmp_api_cfg_path(tmp_api_cfg):
-    return os.path.join(tmp_api_cfg.dirname, tmp_api_cfg.basename)
-
-
-@pytest.fixture(scope='session')
-def test_conf(request, tmp_pages_path, tmp_api_cfg_path, tmp_build):
-    return {
+@pytest.fixture(scope='function')
+def test_conf(request, tmp_pages_path, tmp_build, s3_config):
+    main_settings = {
         'DEBUG': True,
         'TESTING': True,
         'FLATPAGES_ROOT': tmp_pages_path,
         'FLATPAGES_EXTENSION': '.md',
-        'FLATPAGES_MARKDOWN_EXTENSIONS': ['fenced_code', 'footnotes', 'codehilite'],
+        'FLATPAGES_MARKDOWN_EXTENSIONS': [
+            'fenced_code', 'footnotes', 'codehilite'
+        ],
         'FLATPAGES_AUTO_RELOAD': True,
-        'FREEZER_DESTINATION': tmp_build.strpath,
-        'API_CONFIG': tmp_api_cfg_path
+        'FREEZER_DESTINATION': tmp_build.strpath
     }
+    main_settings.update(s3_config)
+    return main_settings
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope='function')
 def test_app(test_conf):
     app = create_app(test_conf)
     return app
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope='function')
 def test_build(test_app):
     sitebuilder.build(test_app)
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope='function')
 def test_client(request, test_app):
     return test_app.test_client()
 
@@ -114,10 +114,15 @@ tags: {tags}
 
 
 @pytest.fixture(scope='session')
-def published_post(request, page_template):
+def post_date():
+    return datetime(2000, 1, 1)
+
+
+@pytest.fixture(scope='session')
+def published_post(page_template, post_date):
     template = dict(
             title='This Post Exists',
-            date_=datetime.today().strftime('%Y-%m-%d'),
+            date_=post_date.strftime('%Y-%m-%d'),
             published=True,
             type_='post',
             tags=','.join(['foo', 'bar', 'baz']),
@@ -128,10 +133,10 @@ def published_post(request, page_template):
 
 
 @pytest.fixture(scope='session')
-def draft_post(request, page_template):
+def draft_post(page_template, post_date):
     template = dict(
             title='This Post Exists',
-            date_=datetime.now().strftime('%Y-%m-%d'),
+            date_=post_date.strftime('%Y-%m-%d'),
             published=False,
             type_='post',
             tags=','.join(['fizz', 'buzz', 'foo']),

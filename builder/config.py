@@ -1,9 +1,11 @@
 import os
+
 from urllib.parse import urljoin
+from tempfile import gettempdir
 
 # Flask Configuration
-BASE_URL = 'https://cameronlane.org'
-PUBLISH_URL = urljoin(BASE_URL, 'blog/posts/')
+BASE_URL = os.getenv('BLOG_BASE_DIR', 'https://cameronlane.org')
+PUBLISH_URL = urljoin(BASE_URL, os.getenv('BLOG_PUBLISH_URL', 'blog/posts/'))
 
 # flask-flatpages
 FLATPAGES_AUTO_RELOAD = True
@@ -14,15 +16,16 @@ FLATPAGES_MARKDOWN_EXTENSIONS = ['fenced_code', 'footnotes', 'codehilite']
 # flask-freezer
 FREEZER_BASE_URL = BASE_URL
 FREEZER_REMOVE_EXTRA_FILES = True
-FREEZER_DESTINATION = os.path.join(
-    os.path.dirname(os.path.abspath(__file__)), 'build')
+FREEZER_DESTINATION = os.getenv('BLOG_BUILD_DIR', os.path.join(gettempdir(), 'blog_build'))
 
 # assets pipeline
 ASSETS_DEBUG = True
 
-# App configuration
-# config specific to this application
+# APP configuration
 FEED_MAX_LINKS = 25
 SECTION_MAX_LINKS = 12
-API_CONFIG = os.path.join(
-    os.path.dirname(os.path.abspath(__file__)), 'apis.cfg')
+
+# DEPLOYMENT Configuration
+AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID', None)
+AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY', None)
+S3_BUCKET = os.getenv('S3_BUCKET', 'cameronlane.org')

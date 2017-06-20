@@ -1,9 +1,9 @@
 ORG ?= crlane
 BASE ?= blog-builder
-TEST ?= blog-builder-test
-DEPLOY ?= blog-builder-deploy
+TEST ?= ${BASE}-test
+DEPLOY ?= ${BASE}-deploy
 
-.PHONY: image test-image deploy-image submodules test
+.PHONY: image deploy submodules test serve
 .IGNORE: clean
 
 all: image test-image
@@ -11,17 +11,20 @@ all: image test-image
 image:
 	@docker build -t ${ORG}/${BASE} .
 
-test-image:
-	@docker build -t ${ORG}/${TEST} -f Dockerfile-test .
+_test:
+	@docker build -t ${ORG}/${TEST} . -f Dockerfile-test
 
-deploy-image:
-	@docker build -t ${ORG}/${DEPLOY} -f Dockerfile-build .
+_install:
+	@pip install .
+
+deploy: _install
+	@sitebuilder deploy
 
 submodules:
 	@git submodules update --init --recursive
 
-test: 
-	@docker run --rm -v`pwd`:/opt/src ${ORG}/${TEST}
+test:  _test
+	@docker run --rm ${ORG}/${TEST}
 
 serve:
 	@docker run --rm -it -v`pwd`/builder/pages:/opt/src/builder/pages -p8000:8000 ${ORG}/${BASE} sitebuilder serve --debug
