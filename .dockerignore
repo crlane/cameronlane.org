@@ -1,10 +1,69 @@
-.git
-.dockerignore
+#  Git
+ .git
+ .gitignore
+
+ # CI
+ .codeclimate.yml
+ .travis.yml
+
+ # Docker
+ docker-compose.yml
+ .docker
+
+ # Byte-compiled / optimized / DLL files
+ **/*/__pycache__/**/*
+ **/*/__pycache__
+ **/*/*.py[cod]
+
+ # C extensions
+ *.so
+
+ # Distribution / packaging
+ .Python
+ env/
+ **/*/build/
+ **/*/develop-eggs/
+ **/*/dist/
+ **/*/eggs/
+ **/*/lib/
+ **/*/lib64/
+ **/*/sdist/
+ **/*/*.egg-info/
+ *.egg-info/
+ **/*/*.egg
+
+ # Installer logs
+ **/*/pip-log.txt
+ **/*/pip-delete-this-directory.txt
+
+ # Unit test / coverage reports
+ **/*/htmlcov/
+ **/*/.tox/
+
+ **/*/.coverage
+ .coverage
+
+ #pytest cache files
+ **/*/.cache/**/*
+ **/*/.cache
+
+ **/*/nosetests.xml
+ **/*/coverage.xml
+
+ # Virtual environment
+ .env/
+ .venv/
+ venv/
+
+
+ # Vim swap files
+ *.swp
+ **/*/*.sw[op]
 
 ### Python ###
-# Byte-compiled / optimized / DLL files
 **/*.py[cod]
 
+#
 # Unit test / coverage reports
 htmlcov/
 .tox/
@@ -14,3 +73,7 @@ htmlcov/
 
 # Sphinx documentation
 docs/_build/
+
+# editor files
+*.*.sw[op]
+**/.*.sw[op]

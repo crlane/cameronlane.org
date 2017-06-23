@@ -22,7 +22,7 @@ log = logging.getLogger(__name__)
 
 blog = Blueprint(
     'blog', __name__,
-    static_folder='static',
+    static_folder='../static',
     template_folder='templates'
 )
 
@@ -146,14 +146,15 @@ def current_year():
 
 
 # helpers
-def pages_filter(tag=None, year=None):
+def pages_filter(tag=None, year=None, published=None):
     '''
     Retrieves pages matching passed criteria.
     '''
     # only posts
     articles = [p for p in pages if p.meta.get('type') == 'post']
     # filter unpublished article
-    if not current_app.debug:
+
+    if published or not current_app.debug:
         articles = [p for p in articles if p.meta.get('published')]
     # filter tag
     if tag:

@@ -31,7 +31,7 @@ from docopt import docopt
 
 from builder.app import (
     create_app,
-    create_freezer
+    create_freezer,
 )
 
 from builder.deploy import (

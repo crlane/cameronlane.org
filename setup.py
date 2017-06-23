@@ -19,7 +19,16 @@ setup(
     author='Cameron Lane',
     author_email='crlane@adamanteus.com',
     url='https://github.com/crlane/cameronlane.org',
-    packages=find_packages(exclude=['tests', 'tests.*']),
+    packages=find_packages(exclude=['test', 'tests', 'tests.*']),
+    zip_safe=False,
+    package_data={'builder': [
+        'templates/*.html',
+        'pages/*.md',
+        'pages/posts/*md',
+        'static/favicon.ico',
+        'static/css/*.css',
+        'static/js/*.js'
+    ]},
     include_package_data=True,
     classifiers=['Private :: Do Not Upload'],
     install_requires=INSTALL_REQUIRES,
