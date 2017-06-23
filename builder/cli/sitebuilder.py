@@ -52,7 +52,6 @@ def build(app, target_dir=None):
     """
     print('Starting website build')
     app.debug = False
-    app.config['ASSETS_DEBUG'] = False
     freezer = create_freezer(app)
     freezer.freeze()
     print('Build is complete.')
@@ -106,7 +105,6 @@ def new(app, draft=True, title=None, section='posts', filename=None):
 def serve(app, host='0.0.0.0', port=8000, debug=False):
     ''' Serves this site.
     '''
-    app.config['ASSETS_DEBUG'] = debug
     app.debug = debug
     app.run(host=host, port=port, debug=debug)
 

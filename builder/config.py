@@ -19,9 +19,6 @@ FREEZER_REMOVE_EXTRA_FILES = True
 FREEZER_DESTINATION = os.getenv('BLOG_BUILD_DIR', os.path.join(gettempdir(), 'blog_build'))
 FREEZER_STATIC_IGNORE = ['javascripts/*', '*.styl', '*.scss', 'stylesheets/*']
 
-# assets pipeline
-ASSETS_DEBUG = True
-
 # APP configuration
 FEED_MAX_LINKS = 25
 SECTION_MAX_LINKS = 12

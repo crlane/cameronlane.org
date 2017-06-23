@@ -11,7 +11,6 @@ with open('requirements.txt', 'r') as f:
 
 with open('test_requirements.txt', 'r') as f:
     TESTS_REQUIRE += [l.strip() for l in f.readlines()]
-    print(TESTS_REQUIRE)
 
 setup(
     name='blog-builder',

@@ -15,10 +15,6 @@ from flask import (
 
 from flask_flatpages import FlatPages
 from flask_frozen import Freezer
-from flask_assets import (
-    Environment,
-    Bundle
-)
 
 
 log = logging.getLogger(__name__)
@@ -48,9 +44,6 @@ def create_app(settings=None):
         app.config.update(settings)
     app.register_blueprint(blog)
 
-    # create the static assets
-    # create_assets(app)
-
     # get the flat pages
     get_pages().init_app(app)
 
@@ -76,29 +69,6 @@ def register_errorhandlers(app):
     for errcode in [403, 404, 500]:
         app.errorhandler(errcode)(render_error)
     return None
-
-
-def create_assets(app):
-    js_filters = ['jsmin'] if not app.debug else []
-    js = Bundle(
-        'javascripts/libs/jquery/jquery-1.11.2.js',
-        'javascripts/libs/jqcloud/jqcloud-1.0.4.js',
-        filters=js_filters,
-        output='js/app.js')
-
-    css_filters = ['cssmin'] if not app.debug else []
-    css = Bundle(
-        'stylesheets/style.css',
-        'stylesheets/jqcloud.css',
-        'stylesheets/code.css',
-        filters=css_filters,
-        output='css/style.css')
-
-    # names the assets to be used in templates
-    assets = Environment(app)
-    assets.register('js_all', js)
-    assets.register('css_all', css)
-    return assets
 
 
 @blog.route('/')
