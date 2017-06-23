@@ -22,7 +22,7 @@ log = logging.getLogger(__name__)
 
 blog = Blueprint(
     'blog', __name__,
-    static_folder='../static',
+    static_folder='static',
     template_folder='templates'
 )
 
