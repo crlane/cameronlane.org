@@ -49,7 +49,7 @@ def create_app(settings=None):
     app.register_blueprint(blog)
 
     # create the static assets
-    create_assets(app)
+    # create_assets(app)
 
     # get the flat pages
     get_pages().init_app(app)

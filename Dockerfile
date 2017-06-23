@@ -1,17 +1,11 @@
-FROM python:3.6.1
+FROM python:3.6.1-alpine3.6 as builder
 ENV PYTHONUNBUFFERED=1
 
-RUN apt-get update && apt-get install -y \
-    software-properties-common\
-    apt-transport-https
-RUN apt-key adv --fetch-keys --keyserver https://deb.nodesource.com/gpgkey/nodesource.gpg.key
-RUN add-apt-repository -y -r ppa:chris-lea/node.js
-RUN echo "deb https://deb.nodesource.com/node_5.x $(lsb_release -sc) main" > /etc/apt/sources.list.d/nodesource.list
-RUN apt-get update && apt-get install -y --force-yes\
-     nodejs
-RUN npm install stylus -g
-RUN mkdir /opt/src
+RUN apk update && apk add nodejs yarn
+
+RUN mkdir -p /opt/src
 ADD . /opt/src
 WORKDIR /opt/src
-
-RUN pip install -e .
+RUN yarn install
+RUN yarn run build:prod
+RUN python setup.py bdist_wheel
