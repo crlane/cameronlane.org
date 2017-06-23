@@ -1,4 +1,4 @@
-FROM python:3.6.1-alpine3.6 as builder
+FROM python:3.6.1-alpine3.6
 ENV PYTHONUNBUFFERED=1
 
 RUN apk update && apk add nodejs yarn
