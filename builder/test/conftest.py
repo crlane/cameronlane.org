@@ -93,15 +93,17 @@ def test_app(request, test_conf):
     directories = []
     for directory in ('js', 'css'):
         full_path = os.path.join(app.static_folder, directory)
-        os.makedirs(full_path)
-        directories.append(full_path)
-        if directory == 'js':
-            filename = 'app.js'
-        else:
-            filename = 'style.css'
+        if not os.path.exists(full_path):
+            os.makedirs(full_path)
+            directories.append(full_path)
+            if directory == 'js':
+                filename = os.path.join(full_path, 'app.js')
+            else:
+                filename = os.path.join(full_path, 'style.css')
 
-        with open(os.path.join(full_path, filename), 'w') as f:
-            f.write(filename)
+            if not os.path.exists(filename):
+                with open(os.path.join(full_path, filename), 'w') as f:
+                    f.write(filename)
 
     def _cleanup():
         for d in directories:
