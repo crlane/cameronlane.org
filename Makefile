@@ -8,27 +8,20 @@ DEPLOY ?= ${BASE}-deploy
 
 all: image
 
+submodules:
+	@git submodules update --init --recursive
+
 image:
 	@docker build -t ${ORG}/${BASE} .
 
+deploy:
+	@docker run --rm ${ORG}/${BASE} sitebuilder deploy --delete
+
 _test:
 	@docker build -t ${ORG}/${TEST} . -f Dockerfile-test
-
-_install:
-	@pip install .
-
-deploy: _install
-	@sitebuilder deploy --delete
-
-submodules:
-	@git submodules update --init --recursive
 
 test:  _test
 	@docker run --rm ${ORG}/${TEST}
 
 serve:
 	@docker run --rm -it -v`pwd`/builder/pages:/opt/src/builder/pages -p8000:8000 ${ORG}/${BASE} sitebuilder serve --debug
-
-clean:
-	@docker stop ${TEST}
-	@docker rm ${TEST}

@@ -11,4 +11,3 @@ RUN yarn run build:prod
 
 RUN python setup.py bdist_wheel
 RUN pip install ./dist/*.whl
-RUN sitebuilder build
