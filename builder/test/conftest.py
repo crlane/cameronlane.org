@@ -1,5 +1,6 @@
 import os
 import pytest
+import shutil
 
 from datetime import datetime
 
@@ -87,8 +88,27 @@ def test_conf(request, tmp_pages_path, tmp_build, s3_config):
 
 
 @pytest.fixture(scope='function')
-def test_app(test_conf):
+def test_app(request, test_conf):
     app = create_app(test_conf)
+    directories = []
+    for directory in ('js', 'css'):
+        full_path = os.path.join(app.static_folder, directory)
+        os.makedirs(full_path)
+        directories.append(full_path)
+        if directory == 'js':
+            filename = 'app.js'
+        else:
+            filename = 'style.css'
+
+        with open(os.path.join(full_path, filename), 'w') as f:
+            f.write(filename)
+
+    def _cleanup():
+        for d in directories:
+            shutil.rmtree(d)
+
+    request.addfinalizer(_cleanup)
+
     return app
 
 

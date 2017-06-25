@@ -47,7 +47,6 @@ def create_app(settings=None):
     # get the flat pages
     get_pages().init_app(app)
 
-    # has to happen after static assets are registered
     register_errorhandlers(app)
 
     return app

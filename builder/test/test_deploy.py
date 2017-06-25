@@ -10,6 +10,7 @@ def deployment(test_app, test_build):
     with patch.object(Deployment, '_connect'):
         yield Deployment(test_app)
 
+
 def test_connect_is_called_in_constructor(deployment):
     assert deployment._connect.call_count == 1
 
