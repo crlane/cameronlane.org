@@ -1,5 +1,5 @@
 # cameronlane.org
-[![Build Status](https://travis-ci.org/crlane/cameronlane.org.svg)](https://travis-ci.org/crlane/cameronlane.org) [![Coverage Status](https://coveralls.io/repos/crlane/cameronlane.org/badge.svg?branch=master&service=github)](https://coveralls.io/github/crlane/cameronlane.org?branch=master)
+[![Build Status](https://travis-ci.org/crlane/cameronlane.org.svg?branch=master)](https://travis-ci.org/crlane/cameronlane.org) [![Coverage Status](https://coveralls.io/repos/crlane/cameronlane.org/badge.svg?branch=master&service=github)](https://coveralls.io/github/crlane/cameronlane.org?branch=master)
 
 This is the code used to write, build, test, and deploy my [personal website and blog](https://cameronlane.org/). The code was originally based on a great blog post by @n1ko, but has since diverged from that project quite a bit. If you're looking for his work, you can check that out <https://nicolas.perriault.net/code/2012/dead-easy-yet-powerful-static-website-generator-with-flask/>. Notable changes from his version: the use of docopt, testing, and python packaging for installation of the sitebuilder script. The javascript and visual design of the site are still almost exactly his. 
 
