@@ -15,7 +15,7 @@ image:
 	@docker build -t ${ORG}/${BASE} .
 
 deploy:
-	@docker run --rm ${ORG}/${BASE} sitebuilder deploy --delete
+	@docker run --rm -e AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID} -e AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY} ${ORG}/${BASE} sitebuilder deploy --delete
 
 _test:
 	@docker build -t ${ORG}/${TEST} . -f Dockerfile-test
