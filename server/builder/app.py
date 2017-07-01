@@ -192,7 +192,7 @@ def paginate(articles, offset=0, limit=0):
 
 def get_years_data(pages):
     years = list(set([page.meta.get('date').year for page in pages]))
-    years.reverse()
+    years.sort(reverse=True)
     return years
 
 

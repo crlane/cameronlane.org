@@ -14,7 +14,7 @@ with open('test_requirements.txt', 'r') as f:
 
 setup(
     name='blog-builder',
-    version='1.1',
+    version='1.2',
     description='A python app to build, deploy a simple static flask app',
     author='Cameron Lane',
     author_email='crlane@adamanteus.com',
