@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-
-
 '''sitebuilder
 
 Usage:
@@ -39,6 +37,10 @@ from builder.deploy import (
     ConfigurationError
 )
 
+from builder.images import (
+    copy_images_to_build
+)
+
 from builder.util import (
     slugify,
     get_file_path
@@ -54,6 +56,9 @@ def build(app, target_dir=None):
     app.debug = False
     freezer = create_freezer(app)
     freezer.freeze()
+    image_src_dir = os.path.join(app.config['FLATPAGES_ROOT'], 'images')
+    image_dst_dir = target_dir or os.path.join(app.config['FREEZER_DESTINATION'], 'images')
+    copy_images_to_build(image_src_dir, image_dst_dir)
     print('Build is complete.')
 
 
@@ -70,7 +75,7 @@ def deploy(app, delete, dry_run):
     print('Successful deployment, done!')
 
 
-def new(app, draft=True, title=None, section='posts', filename=None):
+def new(app, draft=True, title=None, section='pages', filename=None):
     """ Create a new empty post.
 
     :kwarg draft: (bool) should the page be marked as published or not. Defaults to false
@@ -82,7 +87,9 @@ def new(app, draft=True, title=None, section='posts', filename=None):
     title = str(title) if title else u'Untitled Post'
     if not filename:
         filename = u'%s.md' % slugify(title)
-    pathargs = [section, filename, ]
+    pathargs = [filename]
+    if section != 'pages':
+        pathargs = [section] + pathargs
     filepath = get_file_path(app, pathargs)
     if os.path.exists(filepath):
         raise Exception('File %s exists' % filepath)

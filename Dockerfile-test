@@ -2,3 +2,4 @@ FROM crlane/blog-builder
 
 RUN pip install -e '.[testing]'
 ENTRYPOINT py.test .
+

@@ -16,6 +16,7 @@ from flask import (
 from flask_flatpages import FlatPages
 from flask_frozen import Freezer
 
+from flask_htmlmin import HTMLMIN
 
 log = logging.getLogger(__name__)
 
@@ -40,14 +41,15 @@ def create_app(settings=None):
     # create app and configure
     app = Flask(__name__)
     app.config.from_pyfile('config.py')
+
     if settings is not None:
         app.config.update(settings)
+
     app.register_blueprint(blog)
+    HTMLMIN(app)
 
     # get the flat pages
     get_pages().init_app(app)
-
-    register_errorhandlers(app)
 
     return app
 
@@ -57,24 +59,24 @@ def create_freezer(app):
     return freezer
 
 
-# Blueprints cannot register 500 error handler see
-# http://stackoverflow.com/questions/30108000/flask-register-blueprint-error-python
-def register_errorhandlers(app):
+@blog.app_errorhandler(403)
+def forbidden(e):
+    return render_template('403.html', section='error'), 403
 
-    def render_error(error):
-        error_code = getattr(error, 'code', 500)
-        return render_template("{0}.html".format(error_code), section='error'), error_code
 
-    for errcode in [403, 404, 500]:
-        app.errorhandler(errcode)(render_error)
-    return None
+@blog.app_errorhandler(404)
+def page_not_found(e):
+    return render_template('404.html', section='error'), 404
+
+
+@blog.app_errorhandler(500)
+def internal_server_error(e):
+    return render_template('500.html', section='error'), 500
 
 
 @blog.route('/')
 def index():
-    page = pages.get_or_404('home')
-    return render_template('index.html',
-                           page=page, section='home', title='index')
+    return render_template('index.html', section='home', title='index')
 
 
 @blog.route('/blog/')
@@ -95,7 +97,7 @@ def archives():
 
 @blog.route('/blog/archives/<int:year>/')
 def archive(year):
-    posts = pages_filter(year=year )
+    posts = pages_filter(year=year)
     return render_template('archives.html',
                            posts=posts, year=year, section='blog',
                            title='archives {}'.format(year))
@@ -134,9 +136,8 @@ def contact():
 
 @blog.route('/resume/')
 def resume():
-    page = pages.get_or_404('resume')
     return render_template('resume.html',
-                           page=page, section='resume', title='Cameron Lane')
+                           section='resume', title='Cameron Lane')
 
 
 @blog.context_processor

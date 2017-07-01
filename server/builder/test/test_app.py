@@ -38,12 +38,12 @@ def test_get_archives_year(test_client):
 
 
 def test_get_existing_blog_post(test_client):
-    response = test_client.get('/blog/posts/this-post-is-published/')
+    response = test_client.get('/blog/this-post-is-published/')
     assert response.status_code == 200, 'Bad response for existing page'
 
 
 def test_get_missing_blog_post(test_client):
-    response = test_client.get('/blog/posts/this-post-does-not-exist/')
+    response = test_client.get('/blog/this-post-does-not-exist/')
     assert response.status_code == 404, 'Bad response for missing page'
 
 

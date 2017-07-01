@@ -1,23 +1,22 @@
 var path = require('path');
+
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 
 module.exports = {
-  entry: './builder/static/javascripts/index.js',
+  entry: './javascripts/index.js',
   output: {
       filename: 'js/app.js',
-      path: path.resolve(__dirname, 'builder/static')
+      path: path.resolve(__dirname)
   },
   module: {
     rules: [
       {
-        test: /\.css$/,
-        use: ExtractTextPlugin.extract(
-          {
-              fallback: 'style-loader',
-              use: 'css-loader'
-          }
-        )
+        test: /\.styl|css$/,
+        use: ExtractTextPlugin.extract([
+          'css-loader',
+          'stylus-loader'
+        ])
       }
     ]
   },
@@ -26,5 +25,5 @@ module.exports = {
       filename: 'css/style.css',
     }),
     new OptimizeCssAssetsPlugin()
-  ]
+  ],
 };

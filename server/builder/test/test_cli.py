@@ -26,23 +26,23 @@ def mock_args(request):
 @pytest.mark.usefixtures('creates_posts')
 def test_new_blog_post_uses_title(test_app, tmp_pages):
     expected_title = 'This is a new post'
-    assert len(tmp_pages.join('posts').listdir()) == 2
+    assert len(tmp_pages.listdir()) == 2
     sitebuilder.new(test_app, title=expected_title)
     with test_app.test_request_context():
         pages = get_pages()
         pages.reload()
         assert len([p for p in pages if p.meta.get('type') == 'post']) == 3
         # most recent first
-        post = pages.get('posts/this-is-a-new-post')
+        post = pages.get('this-is-a-new-post')
         assert post is not None
         assert post.meta.get('title') == expected_title
 
 
 @pytest.mark.usefixtures('creates_posts')
 def test_new_blog_post_creates_default_file(test_app, tmp_pages):
-    assert len(tmp_pages.join('posts').listdir()) == 2
+    assert len(tmp_pages.listdir()) == 2
     sitebuilder.new(test_app)
-    assert len(tmp_pages.join('posts').listdir()) == 3
+    assert len(tmp_pages.listdir()) == 3
 
 
 def test_cli_calls_correct_function(test_app, mock_args):

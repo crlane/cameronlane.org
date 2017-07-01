@@ -37,11 +37,10 @@ def tmp_build(tmpdir_factory):
 
 @pytest.fixture(scope='function')
 def creates_posts(request, tmp_pages):
-    expected = ['this-post-is-published.md', 'this-post-is-a-draft.md']
+    expected = {'this-post-is-published.md', 'this-post-is-a-draft.md'}
 
     def _reset_posts():
-        posts = tmp_pages.join('posts')
-        for p in posts.visit():
+        for p in tmp_pages.visit():
             if p.basename not in expected:
                 p.remove()
     request.addfinalizer(_reset_posts)
@@ -51,16 +50,9 @@ def creates_posts(request, tmp_pages):
 def tmp_pages(tmpdir_factory, page_template, draft_post, published_post):
     now = datetime.now()
     wd = tmpdir_factory.mktemp('pages')
-    for page in ['home', 'resume', 'contact']:
-        p = wd.ensure('{}.md'.format(page))
-        page_data= page_template.format(
-            **{'title':page, 'date_': now.strftime('%Y-%m-%d'),
-                'published': True, 'type_': 'page', 'tags': '', 'content': '# {}'.format(page)})
-        p.write(page_data)
-
-    published = wd.ensure('posts', 'this-post-is-published.md')
+    published = wd.ensure('this-post-is-published.md')
     published.write(published_post)
-    draft = wd.ensure('posts', 'this-post-is-a-draft.md')
+    draft = wd.ensure('this-post-is-a-draft.md')
     draft.write(draft_post)
     return wd
 

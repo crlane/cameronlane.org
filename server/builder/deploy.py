@@ -39,7 +39,7 @@ class Deployment:
             # ignore hidden directories
             if current.startswith('.'):
                 continue
-            # ignore un min/uglifed js and javascripts
+            # ignore un min/uglifed css and javascripts
             elif 'javascripts' in dirpath or 'stylesheets' in dirpath:
                 continue
             for f in filenames:
@@ -59,6 +59,13 @@ class Deployment:
             if key.name.startswith('.well-known'):
                 print('Skipping DNS verification: {}'.format(key.name))
                 continue
+            elif key.name.startswith('images'):
+                print('Skipping images')
+                continue
+            elif key.name.endswith('404.html'):
+                print('skipping error page')
+                continue
+
             if delete and not dry_run:
                 print('Deleting {}'.format(key.name))
                 key.delete()
@@ -68,4 +75,5 @@ class Deployment:
                 k = Key(self.bucket)
                 k.key = quote(keyname)
                 k.set_contents_from_filename(localpath)
+                k.set_acl('public-read')
             print('Set key contents for {}'.format(keyname))

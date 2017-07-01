@@ -1,12 +1,11 @@
 ORG ?= crlane
 BASE ?= blog-builder
 TEST ?= ${BASE}-test
-DEPLOY ?= ${BASE}-deploy
 
 .PHONY: image deploy submodules test serve
 .IGNORE: clean
 
-all: image
+all: image test
 
 submodules:
 	@git submodules update --init --recursive
@@ -24,4 +23,4 @@ test:  _test
 	@docker run --rm ${ORG}/${TEST}
 
 serve:
-	@docker run --rm -it -v`pwd`/builder/pages:/opt/src/builder/pages -p8000:8000 ${ORG}/${BASE} sitebuilder serve --debug
+	@docker run --rm -it -v`pwd`/server/builder/pages:/opt/src/builder/pages -p8000:8000 ${ORG}/${BASE} sitebuilder serve --debug

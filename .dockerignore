@@ -77,3 +77,5 @@ docs/_build/
 # editor files
 *.*.sw[op]
 **/.*.sw[op]
+
+node_modules/

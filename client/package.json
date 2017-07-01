@@ -15,12 +15,16 @@
     "css-loader": "^0.28.4",
     "cssnano": "^3.10.0",
     "extract-text-webpack-plugin": "^2.1.2",
+    "favicon-emoji": "^1.0.4",
+    "nib": "^1.1.2",
     "optimize-css-assets-webpack-plugin": "^2.0.0",
     "style-loader": "^0.18.2",
     "stylus": "^0.54.5",
+    "stylus-loader": "^3.0.1",
     "webpack": "^3.0.0"
   },
   "scripts": {
+    "favicon": "favicon-emoji -d /assets/favicon.ico --emoji cl",
     "build:dev": "webpack",
     "build:prod": "webpack -p"
   }

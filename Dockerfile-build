@@ -1,7 +1,0 @@
-FROM python:3.6.1
-
-RUN mkdir /opt/src
-ADD . /opt/src
-WORKDIR /opt/src
-
-RUN python setup.py bdist_wheel

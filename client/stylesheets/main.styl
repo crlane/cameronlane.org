@@ -1,5 +1,6 @@
 lesscss-percentage(n)
   (n * 100)%
+
 baseFontSize = 19px
 baseFontFamily = Palatino, "Hoefler Text", Georgia, serif
 baseHeight = 14px
@@ -9,6 +10,11 @@ grey = rgb(85, 85, 86, 1)
 lightGrey = rgb(170, 170, 171, 1)
 lighterGrey = rgb(221, 221, 222, 1)
 textColor = rgb(51, 51, 52, 1)
+
+beforeArrows = "\00AB\00A0"
+afterArrows = "\00A0\00BB"
+dingbatsDecoration = "\273b\00A0\273d\00A0\273b"
+
 .clearfix
   display inline-block
   &:after
@@ -18,6 +24,7 @@ textColor = rgb(51, 51, 52, 1)
     visibility hidden
     line-height 0
     height 0
+
 html[xmlns] .clearfix
   display block
 * html .clearfix
@@ -25,54 +32,68 @@ html[xmlns] .clearfix
 .active
   color darkGrey
   text-decoration none
+
 .arrow-prefixed
   &:before
-    content "\00AB\00A0"
+    content beforeArrows
+
 .arrow-suffixed
   &:after
-    content "\00A0\00BB"
+    content afterArrows
+
 baseFontRatio(ratio)
   font-size (baseFontSize * ratio)
   line-height (baseLineHeight * ratio)
+
 .dingbats-decorated
   &:after
     font-size baseHeight
     height baseHeight
     line-height 0
-    content "\273b\00A0\273d\00A0\273b"
+    content dingBatsDecoration
+
 .more
   text-align right
+
 rounded(radius=5px)
   border-radius radius
   -webkit-border-radius radius
   -moz-border-radius radius
+
 .rounded
   rounded()
+
 wrap()
   white-space pre
   overflow auto
+
 .wrap
   wrap()
+
 body
   background-color #fff
-  width 960px
+  width 1060px
   margin 0 auto
   padding 40px 20px 0
   font-family baseFontFamily
   font-size baseFontSize
   line-height baseLineHeight
   color textColor
+
 a
   color grey
+
 blockquote
   font-style italic
   border-left (baseHeight / 2) solid rgb(238, 238, 238, 1)
   padding-left baseHeight
+
 code, pre
   font-family Consolas, Monaco, "Courier New", monospace
   font-size 90%
   color #555
   line-height (baseLineHeight * 0.75)
+
 figure
   margin 0
   padding 0
@@ -95,11 +116,14 @@ hr
   text-align center
   margin baseHeight 0 (baseHeight * 2.5) 0
   height baseHeight
+
 img
   border none
+
 p
   line-height (baseHeight * 2)
   margin (baseHeight * 2) 0
+
 pre
   padding baseHeight
   color #eee
@@ -108,8 +132,10 @@ pre
   @extend .wrap
   code
     color #eee
+
 q:before, q:after
   content ""
+
 .main-title
   margin-left 300px
   margin-top (baseHeight * 4)
@@ -124,6 +150,7 @@ q:before, q:after
     display block
     font-size (baseHeight * 2)
     color lightGrey
+
 .contents
   margin-left 300px
   min-height 300px
@@ -155,6 +182,7 @@ q:before, q:after
       overflow hidden
     .article-author
       display none
+
   ul.item-list
     padding 0
     list-style-type none
@@ -172,6 +200,7 @@ q:before, q:after
       &.unpublished
         background #ddd
         padding 5px 10px
+
 .sidebar
   position fixed
   top 190px
@@ -194,6 +223,7 @@ q:before, q:after
           font-size 18px
       a:focus, a:hover
         @extend .active
+
 .site-footer
   clear both
   margin-left 300px
@@ -201,106 +231,28 @@ q:before, q:after
   p
     padding-top baseHeight
     border-top 1px solid #ddd
+
 .activeSection
   @extend .active
   @extend .arrow-suffixed
+
+// replace with loop
 body.home
   .sidebar li.home a
     @extend .activeSection
+
 body.blog
   .sidebar li.blog a
     @extend .activeSection
+
 body.contact
   .sidebar li.contact a
     @extend .activeSection
+
 body.resume
   .sidebar li.resume a
     @extend .activeSection
 
-@media (min-width: 769px) and (max-width: 960px)
-  body
-    width auto
-    .contents
-      margin-left 200px
-    .main-title
-      margin-left 200px
-      h2
-        font-size 20px
-    .contents
-      margin-left 200px
-    .sidebar
-      width 150px
-      ul
-        padding 0
-        li
-          font-size 22px
-    .site-footer
-      text-align center
-      margin-left 200px
-@media (max-width: 768px)
-  body
-    font-size 18px
-    line-height 24px
-    width auto
-    .contents
-      margin-left 0
-    .main-title
-      margin-left 0
-      h1
-        margin 20px 0 15px
-      small
-        font-size 20px
-    .sidebar
-      position inherit
-      top inherit
-      margin 0
-      width 100%
-      text-align center
-      li
-        display inline
-        padding-right 16px
-    .site-footer
-      margin-left 0
-@media (min-width: 481px) and (max-width: 768px)
-  body
-    font-size 18px
-    line-height 26px
-    .main-title
-      margin 0
-      h1
-        margin 0
-        font-size 40px
-        line-height 40px
-    p
-      line-height 26px
-    .contents
-      li
-        line-height 26px
-@media (max-width: 480px)
-  body
-    font-size 16px
-    line-height 20px
-    padding 10px
-    width auto
-    .main-title
-      margin 0
-      h1
-        font-size 40px
-        margin 20px 0 8px 0
-      small
-        font-size 20px
-    p
-      line-height 24px
-    .contents
-      li
-        line-height 24px
-    .sidebar
-      ul
-        margin 0
-        padding 0
-        li
-          display inline
-          padding-right 16px
-    .site-footer
-      margin-left 0
-      text-align center
+@import "mobile.styl"
+@import "~jqcloud2/dist/jqcloud.min.css"
+@import "~highlight.js/styles/solarized-dark.css"
