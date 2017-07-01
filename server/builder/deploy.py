@@ -31,6 +31,7 @@ class Deployment:
             bucket = self.app.config.get('S3_BUCKET')
             self.bucket = conn.get_bucket(bucket)
         except Exception as e:
+            print(e)
             raise ConfigurationError('unable to connect and find bucket')
 
     def get_files_for_deploy(self):
