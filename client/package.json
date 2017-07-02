@@ -8,8 +8,7 @@
   "license": "MIT",
   "dependencies": {
     "highlight.js": "^9.12.0",
-    "jqcloud2": "^2.0.3",
-    "jquery": "^3.2.1"
+    "wordcloud": "^1.0.6"
   },
   "devDependencies": {
     "css-loader": "^0.28.4",
