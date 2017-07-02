@@ -1,9 +1,10 @@
 import json
 import logging
-import re
 
 from collections import Counter
 from datetime import date, datetime
+from itertools import chain
+
 from urllib.parse import unquote
 
 from flask import (
@@ -17,10 +18,9 @@ from flask import (
 
 from flask_flatpages import FlatPages
 from flask_frozen import Freezer
-
 from flask_htmlmin import HTMLMIN
 
-COMMA_MATCHER = re.compile(r',\s+')
+from builder.posts import BlogPost
 
 log = logging.getLogger(__name__)
 
@@ -101,7 +101,7 @@ def archives():
 
 @blog.route('/blog/archives/<int:year>/')
 def archive(year):
-    posts = pages_filter(year=year)
+    posts = pages_filter(lambda p: p.from_year(year))
     return render_template('archives.html',
                            posts=posts, year=year, section='blog',
                            title='archives {}'.format(year))
@@ -109,10 +109,10 @@ def archive(year):
 
 @blog.route('/blog/<path:path>/')
 def page(path):
-    post = pages.get_or_404(path)
+    post = BlogPost(pages.get_or_404(path))
     return render_template('post.html',
                            post=post, section='blog',
-                           title=post.meta.get('title'))
+                           title=post.title)
 
 
 # @blog.route('/.well-known/keybase.txt')
@@ -122,8 +122,7 @@ def page(path):
 
 @blog.route('/blog/tag/')
 def tags():
-    tags = get_tag_counts(pages_filter())
-    tag_array = list(generate_tag_wordcloud_data(tags))
+    tag_array = list(generate_tag_wordcloud_data())
     return render_template('tagcloud.html',
                            tags=json.dumps(tag_array),
                            section='blog', title='tagcloud')
@@ -131,17 +130,16 @@ def tags():
 
 @blog.route('/blog/tag/.tags')
 def static_tag_cloud_data():
-    tags = get_tag_counts(pages_filter())
-    tag_array = list(generate_tag_wordcloud_data(tags))
+    tag_array = list(generate_tag_wordcloud_data())
     return jsonify(tag_array), {'content-type': 'application/json'}
 
 
 @blog.route('/blog/tag/<string:tag>/')
 def tag(tag):
     tag = unquote(tag)
-    tagged = pages_filter(tag=tag)
+    tagged_posts = pages_filter(lambda p: p.has_tag(tag))
     return render_template('tag.html',
-                           pages=tagged, tag=tag, section='blog', title=tag)
+                           posts=tagged_posts, tag=tag, section='blog', title=tag)
 
 
 @blog.route('/contact/')
@@ -161,38 +159,24 @@ def current_year():
     return dict(current_year=datetime.utcnow().year)
 
 
-# helpers
-def pages_filter(tag=None, year=None, published=None):
+def pages_filter(*filters):
     '''
     Retrieves pages matching passed criteria.
-    '''
-    # only posts
-    articles = [p for p in pages if p.meta.get('type') == 'post']
-    # filter unpublished article
 
-    if published or not current_app.debug:
-        articles = [p for p in articles if p.meta.get('published')]
-    # filter tag
-    if tag:
-        articles = [p for p in articles if tag in p.meta.get('tags', [])]
-    # filter year
-    if year:
-        articles = [p for p in articles if p.meta.get('date').year == year]
+    :param filters: Function Predicates that must be matched in order for
+    the page to be included in output
+    '''
+
+    posts = map(BlogPost, pages)
+
+    filters = list(filters)
+    if not current_app.debug:
+        filters.append(lambda p: p.is_published)
+
+    posts = (p for p in posts if all(f(p) for f in filters))
 
     # sort by date
-    articles = sorted(articles, reverse=True,
-                      key=lambda p: p.meta.get('date', date.today()))
-
-    # assign prev/next page in series
-    # for i, article in enumerate(articles):
-    #    if i != 0:
-    #        if section and articles[i - 1].meta.get('section') == section:
-    #            article.prev = articles[i - 1]
-    #    if i != len(articles) - 1:
-    #        if section and articles[i + 1].meta.get('section') == section:
-    #            article.next = articles[i + 1]
-
-    return articles
+    return sorted(posts, reverse=True, key=lambda p: p.date)
 
 
 def paginate(articles, offset=0, limit=0):
@@ -206,22 +190,13 @@ def paginate(articles, offset=0, limit=0):
         return articles
 
 
-def get_years_data(pages):
-    years = list(set([page.meta.get('date').year for page in pages]))
+def get_years_data(posts):
+    years = list(set(p.date.year for p in posts))
     years.sort(reverse=True)
     return years
 
 
-def get_tag_counts(pages):
-    tag_dict = Counter()
-    for p in pages:
-        tags = COMMA_MATCHER.sub(',', p.meta.get('tags') or '')
-        if tags:
-            tag_dict.update([t.strip().lower()
-                             for t in tags.split(',') if t])
-    return tag_dict
-
-
-def generate_tag_wordcloud_data(tags):
+def generate_tag_wordcloud_data():
+    tags = Counter(chain.from_iterable(p.tags for p in pages_filter()))
     for tag, weight in tags.items():
         yield dict(text=tag, weight=weight, link=url_for('.tag', tag=tag))

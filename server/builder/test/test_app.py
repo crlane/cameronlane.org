@@ -3,7 +3,7 @@ import pytest
 from datetime import datetime
 from builder.app import (
     pages_filter,
-    get_tag_counts
+    generate_tag_wordcloud_data
 )
 
 
@@ -63,14 +63,14 @@ def test_pages_filter_by_existing_year(test_app, post_date):
     with test_app.test_request_context():
         expected_count = 1
         year = post_date.year
-        assert len(pages_filter(year=year)) == 2,\
+        assert len(pages_filter(lambda p: p.from_year(year))) == 2,\
             'Incorrect number of posts for existing year, {}'.format(year)
 
 
 def test_pages_filter_by_missing_year(test_app, post_date):
     with test_app.test_request_context():
         year = post_date.year + 10
-        assert len(pages_filter(year=year)) == 0,\
+        assert len(pages_filter(lambda p: p.from_year(year))) == 0,\
             'Incorrect number of posts for missing year: {}'.format(year)
 
 
@@ -82,7 +82,7 @@ def test_pages_filter_by_missing_year(test_app, post_date):
 def test_pages_filter_by_tag_based_on_debug(test_app, debug, tag, pages_count):
     test_app.debug = debug
     with test_app.test_request_context():
-        pages = pages_filter(tag=tag)
+        pages = pages_filter(lambda p: p.has_tag(tag))
         assert len(pages) == pages_count,\
             'Incorrect tag count for {} with debug={}'.format(tag, debug)
     test_app.debug = True
@@ -91,7 +91,7 @@ def test_pages_filter_by_tag_based_on_debug(test_app, debug, tag, pages_count):
 def test_pages_filter_by_missing_tag_returns_empty(test_app):
     test_app.debug = True
     with test_app.test_request_context():
-        assert pages_filter(tag='not present') == []
+        assert pages_filter(lambda p: p.has_tag('not present')) == []
 
 
 @pytest.mark.parametrize('debug,pages_count', [(True, 2), (False, 1)])
@@ -103,12 +103,27 @@ def test_pages_filter_selects_posts_based_on_debug(request, test_app, debug, pag
     test_app.debug = True
 
 
-@pytest.mark.parametrize('debug,expected_tags',
-        [(True, {'foo': 2, 'bar': 1, 'baz': 1, 'fizz': 1, 'buzz':1}), 
-            (False, {'foo': 1, 'bar': 1, 'baz': 1})])
-def test_get_tag_counts_based_on_debug(request, test_app, debug, expected_tags):
+@pytest.mark.parametrize('debug,expected_tags', [
+    (True, [
+        {'text': 'foo', 'weight': 2, 'link': '/blog/tag/foo/'},
+        {'text': 'bar', 'weight': 1, 'link': '/blog/tag/bar/'},
+        {'text': 'baz', 'weight': 1, 'link': '/blog/tag/baz/'},
+        {'text': 'fizz', 'weight': 1, 'link': '/blog/tag/fizz/'},
+        {'text': 'buzz', 'weight': 1, 'link': '/blog/tag/buzz/'}
+    ]),
+    (False, [
+        {'text': 'foo', 'weight': 1, 'link': '/blog/tag/foo/'},
+        {'text': 'bar', 'weight': 1, 'link': '/blog/tag/bar/'},
+        {'text': 'baz', 'weight': 1, 'link': '/blog/tag/baz/'}
+    ])
+])
+def test_tag_cloud_counts(request, test_app, debug, expected_tags):
     test_app.debug = debug
+
+    def key_func(t):
+        return t['text']
+
     with test_app.test_request_context():
-        tags = get_tag_counts(pages_filter())
-        assert tags == expected_tags, 'Tag counts are incorrect'
+        tags = sorted(generate_tag_wordcloud_data(), key=key_func)
+        assert tags == sorted(expected_tags, key=key_func), 'Tag counts are incorrect'
     test_app.debug = True

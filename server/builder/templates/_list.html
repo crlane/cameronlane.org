@@ -1,12 +1,12 @@
 <ul>
-{% if pages %}
-{% for page in pages %}
+{% if posts %}
+{% for post in posts %}
     <li>
-        <a href="{{ url_for(".page", path=page.path) }}">{{ page.title }}</a>
-    {% if page.meta.tags|length %}
+        <a href="{{ url_for(".page", path=post.page.path) }}">{{ post.title }}</a>
+    {% if post.tags|length %}
         | Tagged:
-        {% for page_tag in page.meta.tags.split(",") %}
-            <a href="{{ url_for(".tag", tag=page_tag|trim) }}">{{ page_tag }}</a>
+        {% for post_tag in post.tags %}
+            <a href="{{ url_for(".tag", tag=post_tag|trim) }}">{{ post_tag }}</a>
         {% endfor %}
     {% endif %}
     </li>

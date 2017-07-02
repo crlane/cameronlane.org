@@ -2,14 +2,13 @@
 <article>
 {% block contents %}
     {% if post %}
-     {{ post.html | safe }}
+       {{ post.page.html | safe }}
      {% else %}
-     <p>Unable to locate</p>
+       <p>Unable to locate</p>
     {% endif %}
-
-    <div id="disqus_thread"></div>
-{% endblock contents %}
 </article>
+<div id="disqus_thread"></div>
+{% endblock contents %}
 {% block scripts %}
     {{ super() }}
 <script type="text/javascript">
