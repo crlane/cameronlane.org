@@ -9,10 +9,16 @@ if (wc_container !== null) {
   fetch(url).then(function(response) {
         return response.json();
       }).then(function(tags) {
+
+          var list_of_tags = []
+          for (var i = 0; i < tags.length; i++) {
+              var item = tags[i]
+              list_of_tags.push([item.text, item.weight])
+          }
           var options = {
-            list: tags,
+            list: list_of_tags,
             gridSize: 18,
-            weightFactor: 8,
+            weightFactor: 6,
             minFontSize: '6px',
             color: null,
             classes: 'tag',

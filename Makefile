@@ -5,7 +5,7 @@ TEST ?= ${BASE}-test
 .PHONY: image deploy submodules test serve
 .IGNORE: clean
 
-all: image test
+all: image test serve
 
 submodules:
 	@git submodules update --init --recursive

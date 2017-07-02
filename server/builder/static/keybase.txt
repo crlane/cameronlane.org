@@ -1,0 +1,68 @@
+==================================================================
+https://keybase.io/crlane
+--------------------------------------------------------------------
+
+I hereby claim:
+
+  * I am an admin of https://cameronlane.org
+  * I am crlane (https://keybase.io/crlane) on keybase.
+  * I have a public key with fingerprint 2DEE 1D7E 6D28 C87D FB2C  CA48 EA81 2985 3D57 CD15
+
+To do so, I am signing this object:
+
+{
+    "body": {
+        "key": {
+            "eldest_kid": "010140a0c7b8868fbd3a886f6f6d2b0f2b899396daf70073d2c4c35945e0788737c70a",
+            "fingerprint": "2dee1d7e6d28c87dfb2cca48ea8129853d57cd15",
+            "host": "keybase.io",
+            "key_id": "ea8129853d57cd15",
+            "kid": "010140a0c7b8868fbd3a886f6f6d2b0f2b899396daf70073d2c4c35945e0788737c70a",
+            "uid": "d6ec31d2420e544768bb539ff82c3f19",
+            "username": "crlane"
+        },
+        "service": {
+            "hostname": "cameronlane.org",
+            "protocol": "https:"
+        },
+        "type": "web_service_binding",
+        "version": 1
+    },
+    "ctime": 1482938721,
+    "expire_in": 157680000,
+    "prev": "bebc0dc2b59672d08ef32764161bfdac7588fdf4454acb63518b54b6b693b3b3",
+    "seqno": 11,
+    "tag": "signature"
+}
+
+which yields the signature:
+
+-----BEGIN PGP MESSAGE-----
+Version: Keybase OpenPGP v2.0.61
+Comment: https://keybase.io/crypto
+
+yMIgAnicrVJdSBRRFN610twwgk3pnxp9sFpk/u+dDYkoi4pII0TQWuf+zDqpM+vs
+qKlpP08G9SaBkfYQZBJhBmVJqWlEpUX0i4QVVJqg9hJJJdYdqbceu+fh3HvO933n
+nMu5lzLPF/BP1a66knMNHvMP3m2u9BXgYb2OQzap4cJ1XCmdc7SM0LgbKTUJF+Z4
+gRdkXucxQBCq0EBE0tnFYEZExBsigpomaSrRDcDzQCIilrGkaLJCeQAhkAAGvM6F
+OMO0otSJOablMlmRUCoQQJkIxBAQA4kY6zKkOhREDSoSUQAmgsKIJXbcY7DmkB6n
+WabNYuwRmWvvH/j/3HflnBxRKZYEIsoiTxVZBipESJE0w4AilgxB84Bx6lh6OWVo
+7JTpFuXqQxyLVZmYet/qzfE3z5xjWx4oy3aijBxzbNfGdhlLlrhuLB72yG5NzENX
+UxT5oxNBpkXYRzJGFXXipm1xYYEhsWt6woIMRU2CQBRCHD0cMx0aMT2Ewvrl2fHq
+0ComiSjCPMEiUjQViISH1JBEoMqCKiCD6BgoEBrEkGVF1jFSJUWASJGRilRNQsw4
+b7IKy2barJSrR5lm3IxaulvpsLn7+4rm+/wBX+KCBG/DfIHkJX/3btHgQt/J++ln
+1xw49f5cuHU8ryNY+HH7i0ffty0Wuo7MdrYWbpgZXb8xYSItMDUdzBj7lHCmc6b/
+0NX0J8vWJdlDw+0f+msb007cfp0ZC1aX5+oXXW1t7QBw5qdXLgWo1/RHG28UfOKT
+Vk9i7du+tsSC6aIHi80fz7sv9AeP770+0bOx1xltKg8LbUNHkzd3Pf41sLuNii9D
+8Wftw4/zp+n5pPHRDyOfm1qyZ/Nyd+1Q028VN+d8/cL5no29e7qnu2xqeX401bm8
+clPHnfCT0MGWlB7O3fm25HB2Q7a/4vRWfk/g4+DD4KW+0emR0NnYz6Nvltb7Ml+t
+2PKzxx+9OZlcnLq/IeM3J1FAlQ==
+=YqN8
+-----END PGP MESSAGE-----
+
+And finally, I am proving ownership of this host by posting or
+appending to this document.
+
+View my publicly-auditable identity here: https://keybase.io/crlane
+
+==================================================================

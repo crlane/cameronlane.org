@@ -1,14 +1,16 @@
 import json
 import logging
+import re
 
 from collections import Counter
 from datetime import date, datetime
 from urllib.parse import unquote
 
 from flask import (
-    Flask,
     Blueprint,
+    Flask,
     current_app,
+    jsonify,
     render_template,
     url_for
 )
@@ -17,6 +19,8 @@ from flask_flatpages import FlatPages
 from flask_frozen import Freezer
 
 from flask_htmlmin import HTMLMIN
+
+COMMA_MATCHER = re.compile(r',\s+')
 
 log = logging.getLogger(__name__)
 
@@ -111,6 +115,11 @@ def page(path):
                            title=post.meta.get('title'))
 
 
+# @blog.route('/.well-known/keybase.txt')
+# def keybase_verification():
+#     return blog.send_static_file('keybase.txt')
+
+
 @blog.route('/blog/tag/')
 def tags():
     tags = get_tag_counts(pages_filter())
@@ -118,6 +127,13 @@ def tags():
     return render_template('tagcloud.html',
                            tags=json.dumps(tag_array),
                            section='blog', title='tagcloud')
+
+
+@blog.route('/blog/tag/.tags')
+def static_tag_cloud_data():
+    tags = get_tag_counts(pages_filter())
+    tag_array = list(generate_tag_wordcloud_data(tags))
+    return jsonify(tag_array), {'content-type': 'application/json'}
 
 
 @blog.route('/blog/tag/<string:tag>/')
@@ -199,11 +215,11 @@ def get_years_data(pages):
 def get_tag_counts(pages):
     tag_dict = Counter()
     for p in pages:
-        tags = p.meta.get('tags')
+        tags = COMMA_MATCHER.sub(',', p.meta.get('tags') or '')
         if tags:
             tag_dict.update([t.strip().lower()
                              for t in tags.split(',') if t])
-    return dict(tag_dict)
+    return tag_dict
 
 
 def generate_tag_wordcloud_data(tags):

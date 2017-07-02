@@ -23,12 +23,13 @@ setup(
     zip_safe=False,
     package_data={
         'builder': [
-            'templates/*.html',
             'pages/*.md',
             'pages/images/*.png',
-            'static/favicon.ico',
+            'templates/*.html',
             'static/css/*.css',
-            'static/js/*.js'
+            'static/favicon.ico',
+            'static/js/*.js',
+            'static/*.txt',
         ]
     },
     include_package_data=True,
