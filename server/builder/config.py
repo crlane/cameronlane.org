@@ -28,3 +28,4 @@ MINIFY_PAGE = True
 AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID', None)
 AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY', None)
 S3_BUCKET = os.getenv('S3_BUCKET', 'cameronlane.org')
+DISTRIBUTION_ID = os.getenv('CLOUDFRONT_ID', None)

@@ -48,15 +48,13 @@ def test_get_missing_blog_post(test_client):
 
 
 def test_get_existing_tag_index(test_client):
-    response = test_client.get('/blog/tag/existing/')
+    response = test_client.get('/blog/tag/foo/')
     assert response.status_code == 200, 'Bad response for existing tag index page'
 
 
 def test_get_missing_tag_index(test_client):
     response = test_client.get('/blog/tag/missing/')
-    # even though the tag DNE, we 200 because it's a list of pages containing tag
-    # hence, an empty list
-    assert response.status_code == 200, 'Bad response for missing tag index page'
+    assert response.status_code == 404, 'Bad response for missing tag index page'
 
 
 def test_pages_filter_by_existing_year(test_app, post_date):

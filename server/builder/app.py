@@ -8,6 +8,7 @@ from itertools import chain
 from urllib.parse import unquote
 
 from flask import (
+    abort,
     Blueprint,
     Flask,
     current_app,
@@ -138,6 +139,8 @@ def static_tag_cloud_data():
 def tag(tag):
     tag = unquote(tag)
     tagged_posts = pages_filter(lambda p: p.has_tag(tag))
+    if not tagged_posts:
+        abort(404)
     return render_template('tag.html',
                            posts=tagged_posts, tag=tag, section='blog', title=tag)
 

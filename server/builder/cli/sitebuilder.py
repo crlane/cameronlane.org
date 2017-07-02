@@ -22,7 +22,6 @@ import codecs
 import sys
 
 from datetime import datetime
-from tempfile import TemporaryDirectory
 
 from docopt import docopt
 
@@ -47,7 +46,6 @@ from builder.util import (
 )
 
 
-# CLI API
 def build(app, target_dir=None):
     """
     Builds the static app using its configuration
@@ -72,6 +70,7 @@ def deploy(app, delete, dry_run):
         print('No deployment credentials configured. Exiting!')
         sys.exit(1)
     deploy_mgr.deploy(delete=delete, dry_run=dry_run)
+    deploy_mgr.invalidate(dry_run=dry_run)
     print('Successful deployment, done!')
 
 

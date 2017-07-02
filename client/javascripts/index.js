@@ -18,6 +18,7 @@ if (wc_container !== null) {
           var options = {
             list: list_of_tags,
             gridSize: 18,
+            fontFamily: "Palatino, Hoefler Text, Georgia, serif",
             weightFactor: 6,
             minFontSize: '6px',
             color: null,
