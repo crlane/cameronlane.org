@@ -17,3 +17,4 @@ COPY --from=asset_builder /assets/js /opt/src/builder/static/js
 COPY --from=asset_builder /assets/favicon.ico  /opt/src/builder/static
 RUN python setup.py bdist_wheel
 RUN pip install ./dist/*.whl
+RUN sitebuilder build

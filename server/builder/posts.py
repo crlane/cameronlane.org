@@ -29,7 +29,11 @@ class BlogPost:
             return {t.strip().lower() for t in tags.split(',')}
 
     def from_year(self, year):
-        return self.date.year == year
+        try:
+            return self.date.year == year
+        except AttributeError:
+            print('Weird type in {}, {} is of type {}'.format(self.title, self.date, type(self.date)))
+            return False
 
     def has_tag(self, tag):
         return tag in self.tags
