@@ -132,7 +132,7 @@ class Deployment:
             # or we delete and upload again
             if not remote_key:
                 print(f'Remote key does not exist, pushing: {keyname}')
-                self._push(keyname, local_path, bucket)
+                self._push(bucket, keyname, local_path)
             elif not self._same_contents(remote_key, local_path):
                 print(f'Remote key contents have changed, deleting/pushing: {keyname}')
                 self._delete(remote_key)
