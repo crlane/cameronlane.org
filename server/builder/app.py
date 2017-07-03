@@ -2,7 +2,7 @@ import json
 import logging
 
 from collections import Counter
-from datetime import date, datetime
+from datetime import datetime
 from itertools import chain
 
 from urllib.parse import unquote
@@ -116,9 +116,14 @@ def page(path):
                            title=post.title)
 
 
-# @blog.route('/.well-known/keybase.txt')
-# def keybase_verification():
-#     return blog.send_static_file('keybase.txt')
+@blog.route('/.well-known/keybase.txt')
+def keybase_verification_file():
+    return blog.send_static_file('keybase.txt')
+
+
+@blog.route('/robots.txt')
+def seo_instruction_file():
+    return blog.send_static_file('robots.txt')
 
 
 @blog.route('/blog/tag/')
