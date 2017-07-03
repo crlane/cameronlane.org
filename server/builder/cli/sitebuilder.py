@@ -65,12 +65,12 @@ def deploy(app, delete, dry_run):
     print('Building site at {}'.format(destination))
     build(app)
     try:
-        deploy_mgr = Deployment(app, destination)
+        deploy_mgr = Deployment(app, build_dir=destination, delete=delete, dry_run=dry_run)
     except ConfigurationError:
         print('No deployment credentials configured. Exiting!')
         sys.exit(1)
-    deploy_mgr.deploy(delete=delete, dry_run=dry_run)
-    deploy_mgr.invalidate(dry_run=dry_run)
+    deploy_mgr.deploy()
+    deploy_mgr.invalidate()
     print('Successful deployment, done!')
 
 

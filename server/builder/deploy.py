@@ -1,4 +1,5 @@
 import os
+from hashlib import md5
 
 from urllib.parse import quote
 
@@ -13,14 +14,21 @@ class ConfigurationError(Exception):
 
 class Deployment:
 
-    def __init__(self, app, build_dir=None):
+    def __init__(self, app, build_dir=None, delete=False, dry_run=False):
         self.app = app
         if not build_dir:
             build_dir = self.app.config['FREEZER_DESTINATION']
         self.build_dir = build_dir
+        self.delete = delete
+        self.dry_run = dry_run
+
         self._credentials = None
         self._s3 = None
         self._cloudfront = None
+
+        # this will be ignored when cleaning up remote server
+        # TODO: make a way to generate 404.html
+        self.ignores = {'404.html', '/images'}
 
     @property
     def s3(self):
@@ -56,18 +64,19 @@ class Deployment:
                 self._credentials['profile_name'] = 'blog_deploy'
         return self._credentials
 
+    def md5(self, filepath):
+        with open(filepath, 'rb') as f:
+            return md5(f.read()).hexdigest()
+
     def get_files_for_deploy(self):
         for dirpath, dirnames, filenames in os.walk(self.build_dir):
             current = os.path.basename(dirpath)
-            # ignore hidden directories
-            if current.startswith('.'):
-                continue
-            # ignore un min/uglifed css and javascripts
-            elif 'javascripts' in dirpath or 'stylesheets' in dirpath:
+            # ignore hidden directories, except for keybase directory
+            if current.startswith('.') and current != '.well-known':
                 continue
             for f in filenames:
-                # ignore hidden files
-                if f.startswith('.'):
+                # ignore hidden files except for the generated .tags
+                if f.startswith('.') and f != '.tags':
                     continue
                 local_path = os.path.join(dirpath, f)
                 # keyname is relative to the build directory
@@ -77,38 +86,63 @@ class Deployment:
                 keyname = os.path.relpath(local_path, self.build_dir)
                 yield keyname, local_path
 
-    def deploy(self, delete=False, dry_run=True):
+    def _delete(self, remote_key):
+        if self.delete and not self.dry_run:
+            try:
+                remote_key.delete()
+                print(f'\tDeleted {remote_key.name}')
+            except Exception as e:
+                print(f'\tError deleting {remote_key.name}')
+        else:
+            print(f'\tWill not delete key: {remote_key.name} based dry:{self.dry_run} delete:{self.delete}')
+
+    def _push(self, bucket, keyname, local_path):
+        if not self.dry_run:
+            k = Key(bucket)
+            k.key = quote(keyname)
+            k.set_contents_from_filename(local_path, policy='public-read')
+            print(f'\tSet key contents for {k.key}')
+        else:
+            print(f'\tDry run: Would create the key: {keyname}')
+
+    def _same_contents(self, remote_key, local_path):
+        return remote_key.etag.strip('"') == self.md5(local_path)
+
+    def _cleanup(self, remote_keys):
+        while remote_keys:
+            name, extra_key = remote_keys.popitem()
+            if name not in self.ignores:
+                print(f'Extra remote key: {name}')
+                self._delete(extra_key)
+            else:
+                print(f'Ignoring extra file: {name}')
+
+    def deploy(self):
         try:
             b = self.app.config.get('S3_BUCKET')
             bucket = self.s3.get_bucket(b)
+            remote_keys = {k.name: k for k in bucket.get_all_keys()}
         except Exception as e:
-            print('Unable to get s3 bucket {}'.format(b))
+            print(f'Unable to get s3 bucket {b}')
             raise
 
-        for key in bucket.list():
-            if key.name.startswith('.well-known'):
-                print('Skipping DNS verification: {}'.format(key.name))
-                continue
-            elif key.name.startswith('images'):
-                print('Skipping images')
-                continue
-            elif key.name.endswith('404.html'):
-                print('Skipping error page')
-                continue
+        for keyname, local_path in self.get_files_for_deploy():
+            remote_key = remote_keys.pop(keyname, None)
+            # remote key must exist and have the same contents as local path,
+            # or we delete and upload again
+            if not remote_key:
+                print(f'Remote key does not exist, pushing: {keyname}')
+                self._push(keyname, local_path, bucket)
+            elif not self._same_contents(remote_key, local_path):
+                print(f'Remote key contents have changed, deleting/pushing: {keyname}')
+                self._delete(remote_key)
+                self._push(bucket, keyname, local_path)
+            else:
+                print(f'Remote key has not changed: skipping {remote_key.name}')
 
-            if delete and not dry_run:
-                print('Deleting {}'.format(key.name))
-                key.delete()
+        self._cleanup(remote_keys)
 
-        for keyname, localpath in self.get_files_for_deploy():
-            if not dry_run:
-                k = Key(bucket)
-                k.key = quote(keyname)
-                k.set_contents_from_filename(localpath)
-                k.set_acl('public-read')
-            print('Set key contents for {}'.format(keyname))
-
-    def invalidate(self, endpoints=None, dry_run=True):
+    def invalidate(self, endpoints=None):
         if endpoints is None:
             endpoints = ['/*']
         cf_id = os.getenv('CLOUDFRONT_ID')
@@ -116,12 +150,12 @@ class Deployment:
             print('No distribution id set, skipping invalidation...')
             return
         try:
-            if not dry_run:
+            if not self.dry_run:
                 resp = self.cloudfront.create_invalidation_request(cf_id, endpoints)
-                print('Invalidation response: {}'.format(resp))
+                print(f'Invalidation response: {resp}')
             else:
                 print('Skipping invalidaiton due to --dry-run flag')
         except Exception as e:
-            print('Unable to create invalidation request: {}'.format(e))
+            print(f'Unable to create invalidation request: {e}')
         else:
             print('Invalidation request succeeded')

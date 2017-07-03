@@ -4,7 +4,6 @@ import logging
 from collections import Counter
 from datetime import datetime
 from itertools import chain
-
 from urllib.parse import unquote
 
 from flask import (
