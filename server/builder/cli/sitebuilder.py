@@ -112,7 +112,8 @@ def serve(app, host='0.0.0.0', port=8000, debug=False):
     ''' Serves this site.
     '''
     app.debug = debug
-    app.run(host=host, port=port, debug=debug)
+    freezer = create_freezer(app)
+    freezer.run(host=host, port=port, debug=debug)
 
 
 def main(**kwargs):
