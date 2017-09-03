@@ -22,5 +22,5 @@ _test:
 test:  _test
 	@docker run --rm ${ORG}/${TEST}
 
-serve:
-	@docker run --rm -it -v`pwd`/server/builder/pages:/opt/src/builder/pages -p8000:8000 ${ORG}/${BASE} sitebuilder serve --debug
+serve: image
+	@docker run --rm -it -v`pwd`/server/builder/pages:/opt/src/server/builder/pages -p8000:8000 ${ORG}/${BASE} sitebuilder serve --debug
